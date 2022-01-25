@@ -39,6 +39,7 @@ class Point
         }
         return *this;
     }
+    Point& tf_affine(const vector<double> &,const vector<double> &);
 };
 
 Point operator +(const Point & P, const Point & Q);
@@ -77,7 +78,9 @@ class Maillage
     void affiche() const;
     Maillage& tf_affine(const vector<double> &,const vector<double> &);
     Maillage & operator +=(const Maillage &);
-    void save(const char *fn) const;
+    void savecoord(const char *fn) const;
+    void savenumtri(const char *fn) const;
+
 };
 Maillage operator +(const Maillage &, const Maillage &);
 

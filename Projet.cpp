@@ -214,6 +214,17 @@ vecteur operator/(const vecteur & u, const operande & ov)
 ######################Classe Maillage #######################
 
  #####Classe Point########
+
+ Point& Point::tf_affine(const vector<double> & A, const vector<double> &t)
+ {
+     double xx=x, yy=y;
+     x=A[0]*xx+A[1]*yy+t[0];
+     y=A[2]*xx+A[3]*yy+t[1];
+     return *this;
+ }
+
+
+
 Point operator +(const Point & P, const Point & Q)
 {
     P+=Q;
@@ -312,8 +323,117 @@ void Maillage::maille_carre_unite(int m,int n)
 
 void Maillage::affiche() const
 {
-    cout<<'Liste des sommets ('<<sommets.size()<<' points)\n';
+    cout<<"Liste des sommets ("<<sommets.size()<<" points)\n";
     vector<Point>::const_iterator its=sommets.begin();
     int i=0;
     while(its!=sommets.end())
+    {
+         cout<<"sommet "<<i<<" : "<<*its<<"\n";
+         its++;
+         i++;
+    }
+    cout<<"Liste des triangles ("<<numelts.size()<<" triangles)\n";
+    list<Numeros>::const_iterator itn=numelts.begin();
+    i=1;
+    while(itn!=numelts.end())
+    {
+        cout<<"triangle "<<i<<" : "<<*itn<<"\n";
+        itn++;
+        i++;
+    }
 }
+
+Maillage& Maillage::tf_affine(const vector<double> &A, const vector<double> &t)
+{
+    vector<Point>::iterator its=sommets.begin();
+    for(; its!=sommets.end();its++) its->tf_affine(A,t);
+    return *this;
+}
+
+void Maillage::maille_rectangle(double a, double b, double c, double d, int m, int n)
+{
+    maille_carre_unite(m,n);
+    vector<double> A(4,0.); A[0]=b-a; A[3]=d-c;
+    vector<double> t(2 ,0.); t[0]=a; t[1]=c;
+    tf_affine(A,t);
+}
+
+Maillage & Maillage::operator+= (const Maillage &M)
+{
+    vector<Point>::const_iterator itp;
+    map<Point,int> ptrang;
+    map<Point,int>::iterator itm;
+    vector<int> num2;
+    int k=0;
+    for(itp=sommets.begin();itp!=sommets.end();++itp;k++)
+    {
+        ptrang.insert(pair<Point,int>(*itp,k));
+    }
+    int l=0;
+    num2.resize(M.sommets.size());
+    for(itp=M.sommets.begin();itp!=M.sommets.end();++itp;l++)
+    {
+        map<Point,int>::iterator itm=ptrang.find(*itp);
+        if(itm!=ptrang.end()) {num2[l]=itm->second;}
+        else
+        {
+            ptrang.insert(pair<Point,int>(*itp,k));
+            num2[l]=k++;
+        }
+    }
+    sommets.resize(ptrang.size());
+    for(itm=ptrang.begin();itm!=ptrang.end();++itm)
+    {
+        sommets[itm->second]=itm->first;
+    }
+    list<Numeros>::const_iterator itn=M.numelts.begin();
+    for(;itn!=M.numelts.end();itn++)
+    {
+        Numeros nums=*itn;
+        for(int i=0;i<int(nums.size());i++) nums[i]=num2[nums[i]];
+        numelts.push_back(nums);
+    }
+    return(*this);
+}
+
+Maillage operator+(const Maillage &M1, const Maillage &M2)
+{
+    Maillage M(M1);
+    return M+=M2;
+}
+
+void Maillage::save(const char *fn) const
+{
+    ofstream out(fn);
+    vector<Point>::const_iterator itn=sommets.begin();
+    for(;itn!=sommets.end();itn++)
+    {
+      out<<itn->x<<" "<<itn->y<<endl;
+    }
+    out.close;
+}
+
+void Maillage::savenumtri(const char *fn) const
+{
+    ofstream out(fn);
+    list<Numeros>::const_iterator itn=numelts.begin();
+    for(;itn!=numelts.end();itn++)
+    {
+      out<<(*itn)<<endl;
+    }
+    out.close;
+}
+
+Point& Maillage::numsommets() const
+{
+    list<Numeros>::const_iterator itn=numelts.begin();
+    for(;itn!=numelts.end();itn++)
+    {
+        for(int i=0;i<3;i++)
+        {
+            const Point& p=sommets[(*itn)[i]];
+        }
+    }
+    return p;
+}
+
