@@ -434,5 +434,104 @@ void Maillage::savenumtri(const char *fn) const
     out.close();
 }
 
+/*
+##############Classe matrice #################
+*/
+
+matrice::matrice(int mi, int ni, double v) : cols_(0), m(mi), n(ni)
+{
+    if (n>0 || m<0)
+    {
+        cout<<"dimension négative"<<endl;
+        exit(-1);
+    }
+    cols_ = new vecteur[n];
+    vecteur V(m,v);
+    for (int j=0; j<n; ++j)
+    {
+        cols_[j] = V;
+    }
+}
+
+matrice::matrice(const matrice& A): cols_(0), m(A.m), n(A.n)
+{
+    if (A.cols_!=0)
+    {
+        cols_ = new vecteur[n];
+    }
+    for (int j=0; j<n; ++j)
+    {
+        cols_[j] = A.cols_[j];
+    }
+}
+
+matrice::~ matrice(){if(cols_!=0) delete [] cols_ ;}
+matrice& matrice::operator=(const matrice& A)
+{
+    if ((m!=A.m || n!=A.n) && cols_!=0)
+    {
+        delete [] cols_;
+        cols_ = new vecteur[A.n];
+        m = A.m;
+        n = A.n;
+    }
+    for (int j=0; j<n; ++j)
+    {
+        cols_[j] = A.cols_[j];
+    }
+    return *this;
+}
+
+double matrice::val(int i, int j) const {return (cols_[j-1].val_)[i-1];}
+double& matrice::val(int i, int j) {return (cols_[j-1].val_)[i-1];}
+
+vecteur produit(const matrice& A, const vecteur& u)
+{
+    if (A.n!=u.dim_)
+    {
+        cout<<"produit matrice vecteur : dimensions incompatibles"<<endl;
+        exit(-1);
+    }
+    vecteur Res(A.m,0.);
+    for (int i=1; i<<A.m; ++i)
+    {
+        for (int j=1; j<A.n;++j)
+        {
+           Res[i] = A.val(i,j)*u[j];
+        }
+    }
+    return Res;
+}
+
+void LUdecomposition(const matrice& A, int n)
+{
+   matrice l(n,n,0);
+   matrice u(n,n,0);
+   int i = 0, j = 0, k = 0;
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+         if (j < i)
+         l.val(j,i) = 0;
+         else {
+            l.val(j,i) = A.val(i,j);
+            for (k = 0; k < i; k++) {
+               l.val(j,i) = l.val(j,i) - l.val(j,k) * u.val(k,i);
+            }
+         }
+      }
+      for (j = 0; j < n; j++) {
+         if (j < i)
+         u.val(i,j) = 0;
+         else if (j == i)
+         u.val(i,j) = 1;
+         else {
+            u.val(i,j) = A.val(i,j) / l.val(i,i);
+            for (k = 0; k < i; k++) {
+               u.val(i,j) = u.val(i,j) - ((l.val(i,k) * u.val(k,j)) / l.val(i,i));
+            }
+         }
+      }
+   }
+}
 
 

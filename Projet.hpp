@@ -8,13 +8,6 @@ using namespace std ;
 
 
 
-/*
-#############################################################
-###################### Classe Matrice #######################
-#############################################################
-*/
-
-
 
 /*
 #############################################################
@@ -101,11 +94,10 @@ void test_dim(int d1, int d2, const char * org); // test dimension
 // classe vecteur de réels double précision
 class vecteur
 {
-private :
+public :
   int dim_;          // dimension du vecteur
   double * val_;     // tableaux de valeurs
 
-public:
   vecteur(int d=0, double v0=0); // dim et val constante
   vecteur(const vecteur & v);    // constructeur par copie
   ~vecteur();
@@ -176,6 +168,56 @@ vecteur operator/(const vecteur & u, const operande & ov); // u / opv
 
 
 
+/*
+#############################################################
+###################### Classe Matrice #######################
+#############################################################
+*/
+class matrice
+{
+public:
+    vecteur* cols_;
+    int m,n;
+    matrice (int mi=0, int ni=0, double vi=0.);
+    matrice(const matrice& v);
+    ~matrice();
+    matrice& operator=(const matrice& A);
+    double val(int i, int j) const;
+    double& val(int i, int j);
+};
+
+vecteur produit(const matrice& A, const vecteur& u);
+void LUdecomposition(const matrice& A, int n); //On ne s'interesse ici qu'au matrice carré
+
+
+class matrice_profil
+{
+public:
+    int n,m;
+    vecteur Profil;
+    vecteur Posdiag;
+    vecteur Lower;
+    vecteur Upper;
+    matrice_profil(int ni, int mi); //constructeur de la matrice vide
+    matrice_profil(const matrice_profil& A); //constructeur par copie
+    ~matrice_profil();
+    matrice_profil& operator=(const matrice_profil& A);
+    double val(int i, int j) const;
+    double& val(int i, int j);
+};
+
+
+class matrice_sym : public matrice_profil
+{
+public:
+
+};
+
+class matrice_nonsym :public matrice_profil
+{
+public:
+
+};
 
 
 
