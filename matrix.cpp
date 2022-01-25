@@ -257,7 +257,7 @@ matrice& matrice::operator=(const matrice& A)
     return *this;
 }
 
-double matrice::operator[](int i, int j) const
+double matrice::val(int i, int j) const
 {
     if (i>m || j>n || i<0 || j<0)
     {
@@ -267,7 +267,7 @@ double matrice::operator[](int i, int j) const
     return cols_[j][i]; //surcharge du vecteur
 }
 
-double& matrice::operator[](int i, int j)
+double& matrice::val(int i, int j)
 {
     if (i>m || j>n || i<0 || j<0)
     {
@@ -289,7 +289,7 @@ vecteur produit(const matrice& A, const vecteur& u)
     {
         for (int j=1; j<A.n;++j)
         {
-           Res[i] = A[i,j]*u[j];
+           Res[i] = A.val(i,j)*u[j];
         }
     }
     return Res;
@@ -421,7 +421,7 @@ matrice_sym& matrice_sym::operator=(const matrice_sym& A)
     return *this;
 }
 
-double matrice_sym::operator[](int i, int j) const //Opérateur de lecture
+double matrice_sym::val(int i, int j) const //Opérateur de lecture
 {
     if (i==j)
     {
@@ -452,7 +452,7 @@ double matrice_sym::operator[](int i, int j) const //Opérateur de lecture
 }
 
 
-double& matrice_sym::operator[](int i, int j) //Lecture et écriture
+double& matrice_sym::val(int i, int j) //Lecture et écriture
 {
     if (i==j)
     {
@@ -522,12 +522,12 @@ matrice_sym& matrice_sym::operator+(const matrice_sym& A)
     }
     for (int i=0; i<n; ++i)
     {
-        (this)[i,i]+=A[i,i]; //n'incrémente que dans le lower
+        (*this).val(i,i)+=A.val(i,i); //n'incrémente que dans le lower
         //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
 
         for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
         {
-            (this)[i,j]+=A[i,j];
+            (*this).val(i,j)+=A.val(i,j);
         }
 
         /*
@@ -564,12 +564,12 @@ matrice_sym& matrice_sym::operator-(const matrice_sym& A)
     }
     for (int i=0; i<n; ++i)
     {
-        (this)[i,i]-=A[i,i]; //n'incrémente que dans le lower
+        (*this).val(i,i)-=A.val(i,i); //n'incrémente que dans le lower
         //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
 
         for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
         {
-            (this)[i,j]-=A[i,j];
+            (*this).val(i,j)-=A.val(i,j);
         }
     }
     return *this;
@@ -705,7 +705,7 @@ matrice_nonsym& matrice_nonsym::operator=(const matrice_nonsym& A)
     Upper = vecteur(d_up);
     if (n!=A.n)
     {
-        m = A.n;
+        n = A.n;
     }
     for (int k=0; k<d_prof; ++k)
     {
@@ -726,7 +726,7 @@ matrice_nonsym& matrice_nonsym::operator=(const matrice_nonsym& A)
     return *this;
 }
 
-double matrice_nonsym::operator[](int i, int j) const //Opérateur de lecture
+double matrice_nonsym::val(int i, int j) const //Opérateur de lecture
 {
     if (i==j)
     {
@@ -757,7 +757,7 @@ double matrice_nonsym::operator[](int i, int j) const //Opérateur de lecture
 }
 
 
-double& matrice_nonsym::operator[](int i, int j) //Lecture et écriture
+double& matrice_nonsym::val(int i, int j) //Lecture et écriture
 {
     if (i==j)
     {
@@ -829,14 +829,14 @@ matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
     }
     for (int i=0; i<n; ++i)
     {
-        (this)[i,i]+=A[i,i]; //n'incrémente que dans le lower
+        (*this).val(i,i)+=A.val(i,i); //n'incrémente que dans le lower
         //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
         Upper[Posdiag[i]]+=A.Upper[Posdiag[i]];
 
         for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
         {
-            (this)[i,j]+=A[i,j]; //modification de Lower
-            (this)[j,i]+=A[j,i];//modification de Upper
+            (*this).val(i,j)+=A.val(i,j); //modification de Lower
+            (*this).val(j,i)+=A.val(j,i);//modification de Upper
         }
 
         /*
@@ -873,14 +873,14 @@ matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
     }
     for (int i=0; i<n; ++i)
     {
-        (this)[i,i]-=A[i,i]; //n'incrémente que dans le lower
+        (*this).val(i,i)-=A.val(i,i); //n'incrémente que dans le lower
         //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
         Upper[Posdiag[i]]-=A.Upper[Posdiag[i]];
 
         for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
         {
-            (this)[i,j]-=A[i,j];
-            (this)[j,i]-=A[j,i];
+            (*this).val(i,j)-=A.val(i,j);
+            (*this).val(j,i)-=A.val(j,i);
         }
     }
     return *this;

@@ -89,12 +89,12 @@ class matrice
 public:
     vecteur* cols_;
     int m,n;
-    matrice(int mi=0, int ni=0; double vi=0.);
+    matrice(int mi, int ni, double v=0.);
     matrice(const matrice& v);
     ~matrice();
     matrice& operator=(const matrice& A);
-    double operator[](int i, int j) const;
-    double& operator[](int i, int j);
+    double val(int i, int j) const;
+    double& val(int i, int j);
 };
 
 vecteur produit(const matrice& A, const vecteur& u);
@@ -148,8 +148,8 @@ public:
     matrice_sym(const matrice_sym& A); //constructeur par copie
     ~matrice_sym();
     matrice_sym& operator=(const matrice_sym& A);
-    double operator[](int i, int j) const;
-    double& operator[](int i, int j);
+    double val(int i, int j) const;
+    double& val(int i, int j);
     matrice_sym& operator*(double a);
     matrice_sym& operator/(double a);
     matrice_sym& operator+(const matrice_sym& A);
@@ -179,8 +179,8 @@ public:
     matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
     ~matrice_nonsym();
     matrice_nonsym& operator=(const matrice_nonsym& A);
-    double operator[](int i, int j) const;
-    double& operator[](int i, int j);
+    double val(int i, int j) const;
+    double& val(int i, int j);
     matrice_nonsym& operator*(double a);
     matrice_nonsym& operator/(double a);
     matrice_nonsym& operator+(const matrice_nonsym& A);
