@@ -5,8 +5,10 @@
 #include <cmath>
 #include <cstdlib>
 using namespace std;
-
+/*
 #################Classe vecteur ##############
+*/
+
 // utilitaire de messages d'erreur
 void stop(const char * msg)
 {
@@ -208,12 +210,13 @@ vecteur operator/(const vecteur & u, const operande & ov)
   for (int i=0;i<d;i++) uv[i]=u[i]/v[i];
   return uv;
 }
-
+/*
 #############################################################
 
 ######################Classe Maillage #######################
 
  #####Classe Point########
+*/
 
  Point& Point::tf_affine(const vector<double> & A, const vector<double> &t)
  {
@@ -227,28 +230,23 @@ vecteur operator/(const vecteur & u, const operande & ov)
 
 Point operator +(const Point & P, const Point & Q)
 {
-    P+=Q;
-    return P;
+    return Point(P)+=Q;
 }
 Point operator -(const Point & P, const Point & Q)
 {
-    P-=Q;
-    return P;
+    return Point(P)-=Q;
 }
 Point operator *(const Point & P,double a)
 {
-    P*=a;
-    return P;
+    return Point(P)*=a;
 }
 Point operator *(double a,const Point & P)
 {
-    P*=a;
-    return P;
+    return Point(P)*=a;
 }
 Point operator /(const Point & P, double a)
 {
-    P/=a;
-    return P;
+    return Point(P)/=a;
 }
 bool operator ==(const Point & P, const Point & Q)
 {
@@ -272,13 +270,20 @@ bool operator !=(const Point & P, const Point & Q)
         return false;
     }
 }
+
+bool operator <(const Point & P, const Point & Q)
+{
+    return (P.x<Q.x)||((P.x==Q.x)&&(P.y<Q.y));
+}
+
 ostream & operator<<(ostream & out, const Point & P)
 {
     out<<"("<<P.x<<" , "<<P.y<<")";
     return out;
 }
-
+/*
 #### Classe Numeros ####
+*/
 
 ostream& operator<<(ostream& out, const Numeros & N)
 { int i=1;
@@ -286,8 +291,9 @@ ostream& operator<<(ostream& out, const Numeros & N)
   out<<N(i);
   return out;
 }
-
+/*
 #####Classe Maillage ######
+*/
 
 void Maillage::maille_carre_unite(int m,int n)
 {
@@ -297,9 +303,9 @@ void Maillage::maille_carre_unite(int m,int n)
     for (int j=0; j<n+1;j++)
     {
         double y=j*dy;
-        for (int i=0; i<m+1;i++)
+        for (int i=0; i<m+1;i++,its++)
         {
-            *its=Point(i+dx,y);
+            *its=Point(i*dx,y);
         }
     }
     for (int j=0;j<n;j++)
@@ -325,7 +331,7 @@ void Maillage::affiche() const
 {
     cout<<"Liste des sommets ("<<sommets.size()<<" points)\n";
     vector<Point>::const_iterator its=sommets.begin();
-    int i=0;
+    int i=1;
     while(its!=sommets.end())
     {
          cout<<"sommet "<<i<<" : "<<*its<<"\n";
@@ -343,7 +349,7 @@ void Maillage::affiche() const
     }
 }
 
-Maillage& Maillage::tf_affine(const vector<double> &A, const vector<double> &t)
+Maillage& Maillage::affine(const vector<double> &A, const vector<double> &t)
 {
     vector<Point>::iterator its=sommets.begin();
     for(; its!=sommets.end();its++) its->tf_affine(A,t);
@@ -355,7 +361,7 @@ void Maillage::maille_rectangle(double a, double b, double c, double d, int m, i
     maille_carre_unite(m,n);
     vector<double> A(4,0.); A[0]=b-a; A[3]=d-c;
     vector<double> t(2 ,0.); t[0]=a; t[1]=c;
-    tf_affine(A,t);
+    affine(A,t);
 }
 
 Maillage & Maillage::operator+= (const Maillage &M)
@@ -365,13 +371,13 @@ Maillage & Maillage::operator+= (const Maillage &M)
     map<Point,int>::iterator itm;
     vector<int> num2;
     int k=0;
-    for(itp=sommets.begin();itp!=sommets.end();++itp;k++)
+    for(itp=sommets.begin();itp!=sommets.end();++itp,k++)
     {
         ptrang.insert(pair<Point,int>(*itp,k));
     }
     int l=0;
     num2.resize(M.sommets.size());
-    for(itp=M.sommets.begin();itp!=M.sommets.end();++itp;l++)
+    for(itp=M.sommets.begin();itp!=M.sommets.end();++itp,l++)
     {
         map<Point,int>::iterator itm=ptrang.find(*itp);
         if(itm!=ptrang.end()) {num2[l]=itm->second;}
@@ -402,38 +408,31 @@ Maillage operator+(const Maillage &M1, const Maillage &M2)
     return M+=M2;
 }
 
-void Maillage::save(const char *fn) const
+void Maillage::savecoord(const char *fn) const
 {
     ofstream out(fn);
+    out<<sommets.size()<<endl;
     vector<Point>::const_iterator itn=sommets.begin();
-    for(;itn!=sommets.end();itn++)
+    int i=1;
+    for(;itn!=sommets.end();itn++,i++)
     {
-      out<<itn->x<<" "<<itn->y<<endl;
+      out<<i<<" "<<itn->x<<" "<<itn->y<<endl;
     }
-    out.close;
+    out.close();
 }
 
 void Maillage::savenumtri(const char *fn) const
 {
     ofstream out(fn);
+    out<<numelts.size()<<endl;
     list<Numeros>::const_iterator itn=numelts.begin();
-    for(;itn!=numelts.end();itn++)
+    int i=1;
+    for(;itn!=numelts.end();itn++,i++)
     {
-      out<<(*itn)<<endl;
+      out<<i<<" "<<(*itn)<<endl;
     }
-    out.close;
+    out.close();
 }
 
-Point& Maillage::numsommets() const
-{
-    list<Numeros>::const_iterator itn=numelts.begin();
-    for(;itn!=numelts.end();itn++)
-    {
-        for(int i=0;i<3;i++)
-        {
-            const Point& p=sommets[(*itn)[i]];
-        }
-    }
-    return p;
-}
+
 

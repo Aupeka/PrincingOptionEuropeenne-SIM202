@@ -1,23 +1,26 @@
 #ifndef Projet.hpp
 #define Projet.hpp
 #include <iostream>
+#include <vector>
+#include <list>
+#include <map>
 using namespace std ;
 
 
 
-
+/*
 #############################################################
 ###################### Classe Matrice #######################
 #############################################################
+*/
 
 
 
-
-
+/*
 #############################################################
 ###################### Classe Maillage ######################
 #############################################################
-
+*/
 class Point
 {public :
     double x;
@@ -49,6 +52,7 @@ Point operator *(double a,const Point & P);
 Point operator /(const Point & P, double a);
 bool operator ==(const Point & P, const Point & Q);
 bool operator !=(const Point & P, const Point & Q);
+bool operator <(const Point & P, const Point & Q);
 ostream & operator<<(ostream & out, const Point & P);
 
 
@@ -76,7 +80,7 @@ class Maillage
     void maille_carre_unite(int m, int n);
     void maille_rectangle(double a,double b, double c, double d, int m, int n);
     void affiche() const;
-    Maillage& tf_affine(const vector<double> &,const vector<double> &);
+    Maillage& affine(const vector<double> &,const vector<double> &);
     Maillage & operator +=(const Maillage &);
     void savecoord(const char *fn) const;
     void savenumtri(const char *fn) const;
@@ -84,10 +88,11 @@ class Maillage
 };
 Maillage operator +(const Maillage &, const Maillage &);
 
-
+/*
 #############################################################
 ###################### Classe Vecteur #######################
 #############################################################
+*/
 
 // utilitaires
 void stop(const char * msg);                     // message d'arrêt
