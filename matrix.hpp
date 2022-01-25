@@ -1,13 +1,95 @@
+#ifndef matrix.hpp
+#define matrix.hpp
+#include <iostream>
+using namespace std ;
 
-################Classe Matrice##################
-################################################
+/*
+#################################"Classe Vecteur"###################################
+####################################################################################
+*/
+
+// utilitaires
+void stop(const char * msg);                     // message d'arrêt
+void test_dim(int d1, int d2, const char * org); // test dimension
+
+// classe vecteur de réels double précision
+class vecteur
+{
+private :
+  int dim_;          // dimension du vecteur
+  double * val_;     // tableaux de valeurs
+
+public:
+  vecteur(int d=0, double v0=0); // dim et val constante
+  vecteur(const vecteur & v);    // constructeur par copie
+  ~vecteur();
+
+  // tools
+  void init(int d);        // allocation
+  void clear();            // désallocation
+  int dim() const {return dim_;}                // accès dimension
+
+  // opérateur d'assignation
+  vecteur & operator=(const vecteur & v);  // affectation d'un vecteur
+  vecteur & operator=(double x);           // affectation d'une valeur
+
+  // opérateurs d'accès (pour les utilisateurs)
+  double  operator [](int i) const {return val_[i];}   // valeur    0->dim-1
+  double& operator [](int i) {return val_[i];}         // référence 0->dim-1
+  double  operator ()(int i) const {return val_[i-1];} // valeur    1->dim
+  double& operator ()(int i) {return val_[i-1];}       // référence 1->dim
+  vecteur operator ()(int i, int j) const;             // valeurs i à j (0<i<=j<=dim)
+
+  // opérateurs algébriques
+  vecteur& operator +=(const vecteur & v);             // u += v
+  vecteur& operator -=(const vecteur & v);             // u -= v
+  vecteur& operator +=(double x);                      // u += x
+  vecteur& operator -=(double x);                      // u -= x
+  vecteur& operator *=(double x);                      // u *= x
+  vecteur& operator /=(double x);                      // u /= x
+
+  //Fonction supplémentaire : allonge le vecteur d'une longueur 1, insère l'élément et décale les suivants
+  vecteur& add(int i, double v);
+}; // fin de définition de la classe
+
+// opérateurs externes
+vecteur operator +(const vecteur & u); //+ unaire ne fait rien !
+vecteur operator -(const vecteur & u); //- unaire : chgt de signe
+vecteur operator +(const vecteur & u,const vecteur & v); // u + v
+vecteur operator -(const vecteur & u,const vecteur & v); // u - v
+vecteur operator +(const vecteur & u,double x);          // u + x
+vecteur operator +(double x, const vecteur & u);         // x + u
+vecteur operator -(const vecteur & u,double x);          // u - x
+vecteur operator -(double x, const vecteur & u);         // x - u
+vecteur operator *(const vecteur & u,double x);          // u * x
+vecteur operator /(const vecteur & u,double x);          // u / x
+vecteur operator +(double x,const vecteur & u);          // x + u
+vecteur operator -(double x,const vecteur & u);          // x - u
+vecteur operator *(double x,const vecteur & u);          // x * u
+double operator |(const vecteur & u,const vecteur & v);  // u | v
+vecteur operator,(const vecteur & u,const vecteur & v);  // [u1,...,um,v1,...,vn]
+
+// opérateurs de comparaison
+bool operator == (const vecteur & u,const vecteur & v);  // u == v
+bool operator != (const vecteur & u,const vecteur & v);  // u != v
+
+// opérateurs de lecture et d'écriture
+istream & operator>>(istream & is, vecteur & u);         // is >> u
+ostream & operator<<(ostream & os, const vecteur & u);   // os << u
+
+
+
+/*
+##########################"Classe Matrice"####################################
+##############################################################################
+*/
 
 class matrice
 {
 public:
     vecteur* cols_;
     int m,n;
-    matrice (int mi=0, int ni=0; double vi=0.);
+    matrice(int mi=0, int ni=0; double vi=0.);
     matrice(const matrice& v);
     ~matrice();
     matrice& operator=(const matrice& A);
@@ -17,32 +99,112 @@ public:
 
 vecteur produit(const matrice& A, const vecteur& u);
 
+/*
+####################################"Matrice profil"##################################
+######################################################################################
+*/
 
-class matrice_profil
+class matrice_profil //pour matrices à profil symétrique
 {
 public:
-    int n,m;
+    int n; //on ne considère que des matrices carrées car à profil symétriques
     vecteur Profil;
     vecteur Posdiag;
-    vecteur Lower;
-    vecteur Upper;
-    matrice_profil(int ni, int mi); //constructeur de la matrice vide
+    //vecteur Lower;
+    //vecteur Upper;
+    matrice_profil(int ni); //constructeur de la matrice vide
     matrice_profil(const matrice_profil& A); //constructeur par copie
     ~matrice_profil();
+    /*
     matrice_profil& operator=(const matrice_profil& A);
     double operator[](int i, int j) const;
     double& operator[](int i, int j);
+    matrice_profil& operator*(double a);
+    matrice_profil& operator/(double a);
+    matrice_profil& operator+(const matrice_profil& A);
+    matrice_profil& operator-(const matrice_profil& A);
+    */
 };
 
+/*
+matrice_profil& operator*(const matrice_profil& A, double a);
+matrice_profil& operator*(const matrice_profil& A, double a);
+matrice_profil& operator*(double a, const matrice_profil& A);
+matrice_profil& operator+(const matrice_profil& A, const matrice_profil& B);
+matrice_profil& operator-(const matrice_profil& A, const matrice_profil& B);
+*/
+
+/*
+#############################"Matrice symétrique"#####################################
+######################################################################################
+*/
 
 class matrice_sym : public matrice_profil
 {
 public:
+    vecteur Lower;
 
+    matrice_sym(int ni); //constructeur de la matrice vide
+    matrice_sym(const matrice_sym& A); //constructeur par copie
+    ~matrice_sym();
+    matrice_sym& operator=(const matrice_sym& A);
+    double operator[](int i, int j) const;
+    double& operator[](int i, int j);
+    matrice_sym& operator*(double a);
+    matrice_sym& operator/(double a);
+    matrice_sym& operator+(const matrice_sym& A);
+    matrice_sym& operator-(const matrice_sym& A);
 };
 
-class matrice_nonsym :public matrice_profil
+matrice_sym operator*(const matrice_sym& A, double a);
+matrice_sym operator*(const matrice_sym& A, double a);
+matrice_sym operator*(double a, const matrice_sym& A);
+matrice_sym operator+(const matrice_sym& A, const matrice_sym& B);
+matrice_sym operator-(const matrice_sym& A, const matrice_sym& B);
+
+
+/*
+###################"Matrice non symétrique"#######################################
+##################################################################################
+*/
+
+class matrice_nonsym : public matrice_profil
 {
 public:
+    vecteur Lower;
+    vecteur Upper;
 
+    matrice_nonsym(int ni); //constructeur de la matrice vide
+    matrice_nonsym(const matrice_nonsym& A); //constructeur par copie
+    matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
+    ~matrice_nonsym();
+    matrice_nonsym& operator=(const matrice_nonsym& A);
+    double operator[](int i, int j) const;
+    double& operator[](int i, int j);
+    matrice_nonsym& operator*(double a);
+    matrice_nonsym& operator/(double a);
+    matrice_nonsym& operator+(const matrice_nonsym& A);
+    matrice_nonsym& operator-(const matrice_nonsym& A);
 };
+
+matrice_nonsym operator*(const matrice_nonsym& A, double a);
+matrice_nonsym operator*(const matrice_nonsym& A, double a);
+matrice_nonsym operator*(double a, const matrice_nonsym& A);
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B);
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B);
+
+
+/*
+###########################"Opérations mixtes"######################################
+####################################################################################
+*/
+
+//Opérations entre une amtrice symétrique et une non-symétrique
+//Retourne nécessairement une matrice non symétrique
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B);
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B);
+matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B);
+matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B);
+
+
+#endif
