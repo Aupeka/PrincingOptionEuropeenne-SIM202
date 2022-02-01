@@ -75,8 +75,8 @@ class Maillage
     void affiche() const;
     Maillage& affine(const vector<double> &,const vector<double> &);
     Maillage & operator +=(const Maillage &);
-    void savecoord(const char *fn) const;
-    void savenumtri(const char *fn) const;
+    void savecoord(const char *fn) const; //Coordonées de tous les points du maillage et numéro associé de ces sommets
+    void savenumtri(const char *fn) const; // Numéros des sommets constituants chaque triangle et numérotation des triangles
 
 };
 Maillage operator +(const Maillage &, const Maillage &);
@@ -187,7 +187,7 @@ public:
 };
 
 vecteur produit(const matrice& A, const vecteur& u);
-void LUdecomposition(const matrice& A, int n); //On ne s'interesse ici qu'au matrice carré
+void LUdecomposition(const matrice& A,matrice& l,matrice& u, int n); //On ne s'interesse ici qu'au matrice carré
 
 
 class matrice_profil

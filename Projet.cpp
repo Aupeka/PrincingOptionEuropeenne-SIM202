@@ -42,7 +42,7 @@ vecteur::~vecteur()
 
 void vecteur::init(int d) // initialisation avec allocation dynamique
 {
-  if (d<=0) stop("init() : dimension <= 0");
+  if (d<0) stop("init() : dimension <= 0");
   dim_=d;
   val_ = new double[d];
 }
@@ -440,7 +440,7 @@ void Maillage::savenumtri(const char *fn) const
 
 matrice::matrice(int mi, int ni, double v) : cols_(0), m(mi), n(ni)
 {
-    if (n>0 || m<0)
+    if (n<0 || m<0)
     {
         cout<<"dimension négative"<<endl;
         exit(-1);
@@ -503,30 +503,28 @@ vecteur produit(const matrice& A, const vecteur& u)
     return Res;
 }
 
-void LUdecomposition(const matrice& A, int n)
+void LUdecomposition(const matrice& A,matrice& l,matrice& u, int n)
 {
-   matrice l(n,n,0);
-   matrice u(n,n,0);
-   int i = 0, j = 0, k = 0;
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) {
+   int i = 1, j = 1, k = 1;
+   for (i = 1; i < n+1; i++) {
+      for (j = 1; j < n+1; j++) {
          if (j < i)
          l.val(j,i) = 0;
          else {
             l.val(j,i) = A.val(i,j);
-            for (k = 0; k < i; k++) {
+            for (k = 1; k < i+1; k++) {
                l.val(j,i) = l.val(j,i) - l.val(j,k) * u.val(k,i);
             }
          }
       }
-      for (j = 0; j < n; j++) {
+      for (j = 1; j < n+1; j++) {
          if (j < i)
          u.val(i,j) = 0;
          else if (j == i)
          u.val(i,j) = 1;
          else {
             u.val(i,j) = A.val(i,j) / l.val(i,i);
-            for (k = 0; k < i; k++) {
+            for (k = 1; k < i+1; k++) {
                u.val(i,j) = u.val(i,j) - ((l.val(i,k) * u.val(k,j)) / l.val(i,i));
             }
          }
