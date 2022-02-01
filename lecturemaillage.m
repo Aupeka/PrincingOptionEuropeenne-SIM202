@@ -24,10 +24,10 @@ opts.ConsecutiveDelimitersRule = "join";
 opts.LeadingDelimitersRule = "ignore";
 
 % Import the data
-tbl = readtable("C:\SIM202\Projet\Test.txt", opts);
+tbl = readtable("C:\SIM202\Projet\Sommet.txt", opts);
 
 %% Convert to output type
-coordsommets=cat(2,tbl.x,tbl.y);
+Coorneu=cat(2,tbl.x,tbl.y);
 
 %% Clear temporary variables
 clear opts tbl
@@ -50,10 +50,10 @@ opts.ConsecutiveDelimitersRule = "join";
 opts.LeadingDelimitersRule = "ignore";
 
 % Import the data
-tbl = readtable("C:\SIM202\Projet\Test2.txt", opts);
+tbl = readtable("C:\SIM202\Projet\Triangle.txt", opts);
 
 %% Convert to output type
-Numtri=cat(2,tbl.Sommet1,tbl.Sommet2,tbl.Sommet3);
+Numtri=cat(2,tbl.Sommet1+1,tbl.Sommet2+1,tbl.Sommet3+1);
 
 %% Clear temporary variables
 clear opts tbl
