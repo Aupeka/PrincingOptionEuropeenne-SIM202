@@ -44,7 +44,7 @@ vecteur::~vecteur()
 
 void vecteur::init(int d) // initialisation avec allocation dynamique
 {
-  if (d<=0) stop("init() : dimension <= 0");
+  if (d<0) stop("init() : dimension <= 0");
   dim_=d;
   val_ = new double[d];
 }
@@ -285,7 +285,7 @@ vecteur produit(const matrice& A, const vecteur& u)
         exit(-1);
     }
     vecteur Res(A.m,0.);
-    for (int i=1; i<<A.m; ++i)
+    for (int i=1; i<A.m; ++i)
     {
         for (int j=1; j<A.n;++j)
         {
@@ -310,70 +310,73 @@ matrice_profil::matrice_profil(int ni) : n(ni), Profil(0), Posdiag(0)
 }
 
 
- matrice_profil::matrice_profil(const matrice_profil& A):n(A.n)
- {
-     int d_prof = A.Profil.dim();
-     int d_pos = A.Posdiag.dim();
-     if (d_prof!=0)
-    {
-        Profil = vecteur(d_prof);
-        Posdiag = vecteur(d_pos);
-    }
-    for (int k=0; k<d_prof; ++k)
-    {
-        Profil[k] = A.Profil[k];
-    }
-    for (int k=0; k<d_pos; ++k)
-    {
-        Posdiag[k] = A.Posdiag[k];
-    }
- }
+matrice_profil::matrice_profil(const matrice_profil& A):n(A.n)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    if (d_prof!=0)
+   {
+       Profil = vecteur(d_prof);
+       Posdiag = vecteur(d_pos);
+   }
+   for (int k=0; k<d_prof; ++k)
+   {
+       Profil[k] = A.Profil[k];
+   }
+   for (int k=0; k<d_pos; ++k)
+   {
+       Posdiag[k] = A.Posdiag[k];
+   }
+}
 
-  matrice_profil::~matrice_profil()
- {
-     if (Profil!=0)
-     {
-         delete [] Profil;
-     }
-     if (Posdiag!=0)
-     {
-         delete [] Posdiag;
-     }
-     n=0;
- }
+/*
+matrice_profil::~matrice_profil()
+{
+   if (Profil!=0)
+   {
+       delete [] Profil;
+   }
+   if (Posdiag!=0)
+   {
+       delete [] Posdiag;
+   }
+   n=0;
+}
+ */
 
 /*
  #####################################"Matrice sym"########################################################
  ##########################################################################################################
 */
 
- matrice_sym::matrice_sym(int ni) : matrice_profil(ni), Lower(0) {}
+matrice_sym::matrice_sym(int ni) : matrice_profil(ni), Lower(0) {}
 
- matrice_sym::matrice_sym(const matrice_sym& A):matrice_profil(A.n)
- {
-     int d_prof = A.Profil.dim();
-     int d_pos = A.Posdiag.dim();
-     int d_low = A.Lower.dim();
-     if (d_prof!=0)
-    {
-        Profil = vecteur(d_prof);
-        Posdiag = vecteur(d_pos);
-        Lower = vecteur(d_low);
-    }
-    for (int k=0; k<d_prof; ++k)
-    {
-        Profil[k] = A.Profil[k];
-    }
-    for (int k=0; k<d_pos; ++k)
-    {
-        Posdiag[k] = A.Posdiag[k];
-    }
-    for (int k=0; k<d_low; ++k)
-    {
-        Lower[k] = A.Lower[k];
-    }
- }
+matrice_sym::matrice_sym(const matrice_sym& A):matrice_profil(A.n)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    int d_low = A.Lower.dim();
+    if (d_prof!=0)
+   {
+       Profil = vecteur(d_prof);
+       Posdiag = vecteur(d_pos);
+       Lower = vecteur(d_low);
+   }
+   for (int k=0; k<d_prof; ++k)
+   {
+       Profil[k] = A.Profil[k];
+   }
+   for (int k=0; k<d_pos; ++k)
+   {
+       Posdiag[k] = A.Posdiag[k];
+   }
+   for (int k=0; k<d_low; ++k)
+   {
+       Lower[k] = A.Lower[k];
+   }
+}
 
+ /*
  matrice_sym::~matrice_sym()
  {
      if (Profil!=0)
@@ -390,15 +393,13 @@ matrice_profil::matrice_profil(int ni) : n(ni), Profil(0), Posdiag(0)
      }
      n = 0;
  }
+*/
 
 matrice_sym& matrice_sym::operator=(const matrice_sym& A)
 {
     int d_prof = A.Profil.dim();
     int d_pos = A.Posdiag.dim();
     int d_low = A.Lower.dim();
-    delete [] Profil;
-    delete [] Posdiag;
-    delete [] Lower;
     Profil = vecteur(d_prof);
     Posdiag = vecteur(d_pos);
     Lower = vecteur(d_low);
@@ -515,7 +516,7 @@ matrice_sym& matrice_sym::operator/(double a)
 
 matrice_sym& matrice_sym::operator+(const matrice_sym& A)
 {
-    if (n=!A.n)
+    if (n!=A.n)
     {
         cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
         exit(-1);
@@ -557,7 +558,7 @@ matrice_sym& matrice_sym::operator+(const matrice_sym& A)
 
 matrice_sym& matrice_sym::operator-(const matrice_sym& A)
 {
-    if (n=!A.n)
+    if (n!=A.n)
     {
         cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
         exit(-1);
@@ -573,6 +574,19 @@ matrice_sym& matrice_sym::operator-(const matrice_sym& A)
         }
     }
     return *this;
+}
+
+void print(const matrice_sym& A)
+{
+    for (int i=0; i<A.n; ++i)
+    {
+        cout<<"[";
+        for (int j=0; j<A.n; ++j)
+        {
+            cout<<A.val(i,j);
+        }
+        cout<<"]"<<endl;
+    }
 }
 
 matrice_sym operator*(const matrice_sym& A, double a)
@@ -668,6 +682,7 @@ matrice_sym operator-(const matrice_sym& A, const matrice_sym& B)
     }
  }
 
+ /*
  matrice_nonsym::~matrice_nonsym()
  {
      if (Profil!=0)
@@ -688,6 +703,7 @@ matrice_sym operator-(const matrice_sym& A, const matrice_sym& B)
      }
      n = 0;
  }
+ */
 
 matrice_nonsym& matrice_nonsym::operator=(const matrice_nonsym& A)
 {
@@ -695,10 +711,6 @@ matrice_nonsym& matrice_nonsym::operator=(const matrice_nonsym& A)
     int d_pos = A.Posdiag.dim();
     int d_low = A.Lower.dim();
     int d_up = A.Upper.dim();
-    delete [] Profil;
-    delete [] Posdiag;
-    delete [] Lower;
-    delete [] Upper;
     Profil = vecteur(d_prof);
     Posdiag = vecteur(d_pos);
     Lower = vecteur(d_low);
@@ -822,7 +834,7 @@ matrice_nonsym& matrice_nonsym::operator/(double a)
 
 matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
 {
-    if (n=!A.n)
+    if (n!=A.n)
     {
         cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
         exit(-1);
@@ -866,7 +878,7 @@ matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
 
 matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
 {
-    if (n=!A.n)
+    if (n!=A.n)
     {
         cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
         exit(-1);
@@ -884,6 +896,19 @@ matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
         }
     }
     return *this;
+}
+
+void print(const matrice_nonsym& A)
+{
+    for (int i=0; i<A.n; ++i)
+    {
+        cout<<"[";
+        for (int j=0; j<A.n; ++j)
+        {
+            cout<<A.val(i,j);
+        }
+        cout<<"]"<<endl;
+    }
 }
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a)
@@ -928,10 +953,10 @@ matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B)
 
 matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B)
 {
-    matrice_nonsym(A)+B;
+    return matrice_nonsym(A)+B;
 }
 
 matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B)
 {
-    matrice_nonsym(A)-B;
+    return matrice_nonsym(A)-B;
 }

@@ -1,5 +1,5 @@
-#ifndef matrix.hpp
-#define matrix.hpp
+#ifndef matrix_hpp
+#define matrix_hpp
 #include <iostream>
 using namespace std ;
 
@@ -114,25 +114,8 @@ public:
     //vecteur Upper;
     matrice_profil(int ni); //constructeur de la matrice vide
     matrice_profil(const matrice_profil& A); //constructeur par copie
-    ~matrice_profil();
-    /*
-    matrice_profil& operator=(const matrice_profil& A);
-    double operator[](int i, int j) const;
-    double& operator[](int i, int j);
-    matrice_profil& operator*(double a);
-    matrice_profil& operator/(double a);
-    matrice_profil& operator+(const matrice_profil& A);
-    matrice_profil& operator-(const matrice_profil& A);
-    */
+    //~matrice_profil();
 };
-
-/*
-matrice_profil& operator*(const matrice_profil& A, double a);
-matrice_profil& operator*(const matrice_profil& A, double a);
-matrice_profil& operator*(double a, const matrice_profil& A);
-matrice_profil& operator+(const matrice_profil& A, const matrice_profil& B);
-matrice_profil& operator-(const matrice_profil& A, const matrice_profil& B);
-*/
 
 /*
 #############################"Matrice symétrique"#####################################
@@ -146,7 +129,7 @@ public:
 
     matrice_sym(int ni); //constructeur de la matrice vide
     matrice_sym(const matrice_sym& A); //constructeur par copie
-    ~matrice_sym();
+    //~matrice_sym();
     matrice_sym& operator=(const matrice_sym& A);
     double val(int i, int j) const;
     double& val(int i, int j);
@@ -155,6 +138,8 @@ public:
     matrice_sym& operator+(const matrice_sym& A);
     matrice_sym& operator-(const matrice_sym& A);
 };
+
+void print(const matrice_sym& A);
 
 matrice_sym operator*(const matrice_sym& A, double a);
 matrice_sym operator*(const matrice_sym& A, double a);
@@ -177,7 +162,7 @@ public:
     matrice_nonsym(int ni); //constructeur de la matrice vide
     matrice_nonsym(const matrice_nonsym& A); //constructeur par copie
     matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
-    ~matrice_nonsym();
+    //~matrice_nonsym();
     matrice_nonsym& operator=(const matrice_nonsym& A);
     double val(int i, int j) const;
     double& val(int i, int j);
@@ -186,6 +171,8 @@ public:
     matrice_nonsym& operator+(const matrice_nonsym& A);
     matrice_nonsym& operator-(const matrice_nonsym& A);
 };
+
+void print(const matrice_nonsym& A);
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a);
 matrice_nonsym operator*(const matrice_nonsym& A, double a);
