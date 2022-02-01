@@ -82,7 +82,7 @@ ostream & operator<<(ostream & os, const vecteur & u);   // os << u
 /*
 ##########################"Classe Matrice"####################################
 ##############################################################################
-*/
+
 
 class matrice
 {
@@ -93,13 +93,13 @@ public:
     matrice(const matrice& v);
     ~matrice();
     matrice& operator=(const matrice& A);
-    double val(int i, int j) const;
-    double& val(int i, int j);
+    double operator()(int i, int j) const;
+    double& operator()(int i, int j);
 };
 
 vecteur produit(const matrice& A, const vecteur& u);
 
-/*
+
 ####################################"Matrice profil"##################################
 ######################################################################################
 */
@@ -131,22 +131,24 @@ public:
     matrice_sym(const matrice_sym& A); //constructeur par copie
     //~matrice_sym();
     matrice_sym& operator=(const matrice_sym& A);
-    double val(int i, int j) const;
-    double& val(int i, int j);
+    double operator()(int i, int j) const;
+    double& operator()(int i, int j);
     matrice_sym& operator*(double a);
     matrice_sym& operator/(double a);
-    matrice_sym& operator+(const matrice_sym& A);
-    matrice_sym& operator-(const matrice_sym& A);
+    matrice_sym& operator+(const matrice_sym& A); //On suppose que les matrices ont le même profil
+    matrice_sym& operator-(const matrice_sym& A); //On suppose que les matrices ont le même profil
 };
 
 void print(const matrice_sym& A);
 
 matrice_sym operator*(const matrice_sym& A, double a);
-matrice_sym operator*(const matrice_sym& A, double a);
+matrice_sym operator/(const matrice_sym& A, double a);
 matrice_sym operator*(double a, const matrice_sym& A);
-matrice_sym operator+(const matrice_sym& A, const matrice_sym& B);
-matrice_sym operator-(const matrice_sym& A, const matrice_sym& B);
+vecteur operator*(const matrice_sym& A, const vecteur& V);
+matrice_sym operator+(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
+matrice_sym operator-(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
 
+matrice_sym transpose(const matrice_sym& A);
 
 /*
 ###################"Matrice non symétrique"#######################################
@@ -164,22 +166,24 @@ public:
     matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
     //~matrice_nonsym();
     matrice_nonsym& operator=(const matrice_nonsym& A);
-    double val(int i, int j) const;
-    double& val(int i, int j);
+    double operator()(int i, int j) const;
+    double& operator()(int i, int j);
     matrice_nonsym& operator*(double a);
     matrice_nonsym& operator/(double a);
-    matrice_nonsym& operator+(const matrice_nonsym& A);
-    matrice_nonsym& operator-(const matrice_nonsym& A);
+    matrice_nonsym& operator+(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
+    matrice_nonsym& operator-(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
 };
 
 void print(const matrice_nonsym& A);
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a);
-matrice_nonsym operator*(const matrice_nonsym& A, double a);
+matrice_nonsym operator/(const matrice_nonsym& A, double a);
+vecteur operator*(const matrice_nonsym& A, const vecteur& V);
 matrice_nonsym operator*(double a, const matrice_nonsym& A);
-matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B);
-matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B);
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
 
+matrice_nonsym transpose(const matrice_nonsym& A);
 
 /*
 ###########################"Opérations mixtes"######################################
@@ -188,10 +192,10 @@ matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B);
 
 //Opérations entre une amtrice symétrique et une non-symétrique
 //Retourne nécessairement une matrice non symétrique
-matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B);
-matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B);
-matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B);
-matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B);
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
 
 
 #endif
