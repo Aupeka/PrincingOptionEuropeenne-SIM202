@@ -28,7 +28,7 @@ public:
   void init(int d);        // allocation
   void clear();            // désallocation
   int dim() const {return dim_;}                // accès dimension
-
+  void resize(int ni);
   // opérateur d'assignation
   vecteur & operator=(const vecteur & v);  // affectation d'un vecteur
   vecteur & operator=(double x);           // affectation d'une valeur
@@ -112,7 +112,7 @@ public:
     vecteur Posdiag;
     //vecteur Lower;
     //vecteur Upper;
-    matrice_profil(int ni); //constructeur de la matrice vide
+    matrice_profil(int ni, const vecteur Pi); //constructeur de la matrice à partir du profil
     matrice_profil(const matrice_profil& A); //constructeur par copie
     //~matrice_profil();
 };
@@ -127,7 +127,7 @@ class matrice_sym : public matrice_profil
 public:
     vecteur Lower;
 
-    matrice_sym(int ni); //constructeur de la matrice vide
+    matrice_sym(int ni, const vecteur Pi); //constructeur de la matrice
     matrice_sym(const matrice_sym& A); //constructeur par copie
     //~matrice_sym();
     matrice_sym& operator=(const matrice_sym& A);
@@ -161,7 +161,7 @@ public:
     vecteur Lower;
     vecteur Upper;
 
-    matrice_nonsym(int ni); //constructeur de la matrice vide
+    matrice_nonsym(int ni, const vecteur Pi); //constructeur de la matrice vide
     matrice_nonsym(const matrice_nonsym& A); //constructeur par copie
     matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
     //~matrice_nonsym();

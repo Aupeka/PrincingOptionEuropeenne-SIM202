@@ -55,6 +55,37 @@ void vecteur::clear()    // désallocation
   dim_=0;
 }
 
+void vecteur::resize(int ni)
+{
+    if (ni<=0)
+    {
+        cout<<"Dimension demandée <=0"<<endl;
+        exit(-1);
+    }
+    if (ni>dim_)
+    {
+        double * temp_ = new double[ni];
+        for (int k=0; k<dim_; ++k)
+        {
+            temp_[k] = val_[k];
+        }
+
+        for (int k=dim_; k<ni; ++k)
+        {
+            temp_[k] = 0.;
+        }
+        dim_ = ni;
+        delete [] val_;
+        val_ = temp_;
+    }
+    else
+    {
+        dim_ = ni;
+        cout<<"Pas besoin de redimensionnement car la taille actuelle >= à la taille demandée"<<endl;
+        exit(-1);
+    }
+}
+
 // affectation
 vecteur & vecteur::operator=(const vecteur & v)  // affectation d'un vecteur
 {
@@ -300,12 +331,17 @@ vecteur produit(const matrice& A, const vecteur& u)
 #######################################################################################################################
 */
 
-matrice_profil::matrice_profil(int ni) : n(ni), Profil(0), Posdiag(0)
+matrice_profil::matrice_profil(int ni, const vecteur Pi) : n(ni), Profil(Pi), Posdiag(0)
 {
     if (n<0)
     {
         cout<<"dimension négative"<<endl;
         exit(-1);
+    }
+    Posdiag.resize(n);
+    for (int k=1; k<n; ++k) //1er terme est nécessairement sur la diagonale
+    {
+        Posdiag[k] = Posdiag[k-1] + (k-Profil[k]+1); //nombre de terme par ligne ajouté
     }
 }
 
@@ -349,9 +385,13 @@ matrice_profil::~matrice_profil()
  ##########################################################################################################
 */
 
-matrice_sym::matrice_sym(int ni) : matrice_profil(ni), Lower(0) {}
+matrice_sym::matrice_sym(int ni, const vecteur Pi) : matrice_profil(ni, Pi), Lower(0)
+{
+    //Lower = vecteur(int(Posdiag[ni-1])+1,0.); //initialisation de longueur connue : dernier terme de Posdiag + 1
+    Lower.resize(int(Posdiag[ni-1])+1);
+}
 
-matrice_sym::matrice_sym(const matrice_sym& A):matrice_profil(A.n)
+matrice_sym::matrice_sym(const matrice_sym& A):matrice_profil(A.n,A.Profil)
 {
     int d_prof = A.Profil.dim();
     int d_pos = A.Posdiag.dim();
@@ -465,7 +505,7 @@ double& matrice_sym::operator()(int i, int j) //Lecture et écriture
     }
     else //avant le premier terme non-nul de la ligne
     {
-        cout<<"Coordonnées hors profil"<<endl;
+        cout<<"Coordonnees hors profil"<<endl;
         exit(-1);
 
         /*
@@ -625,9 +665,15 @@ matrice_sym transpose(const matrice_sym& A)
 ###########################################################################################################
 */
 
- matrice_nonsym::matrice_nonsym(int ni) : matrice_profil(ni), Lower(0), Upper(0) {}
+ matrice_nonsym::matrice_nonsym(int ni, const vecteur Pi) : matrice_profil(ni, Pi), Lower(0), Upper(0)
+ {
+    //Lower = vecteur(int(Posdiag[ni-1])+1,0.); //initialisation de longueur connue : dernier terme de Posdiag + 1
+    //Upper = vecteur(int(Posdiag[ni-1])+1,0.);
+    Lower.resize(int(Posdiag[ni-1])+1);
+    Upper.resize(int(Posdiag[ni-1])+1);
+ }
 
- matrice_nonsym::matrice_nonsym(const matrice_nonsym& A):matrice_profil(A.n)
+ matrice_nonsym::matrice_nonsym(const matrice_nonsym& A):matrice_profil(A.n,A.Profil)
  {
      int d_prof = A.Profil.dim();
      int d_pos = A.Posdiag.dim();
@@ -658,7 +704,7 @@ matrice_sym transpose(const matrice_sym& A)
     }
  }
 
- matrice_nonsym::matrice_nonsym(const matrice_sym& A):matrice_profil(A.n)//constructeur par copie à partir d'une matrice symétrique
+ matrice_nonsym::matrice_nonsym(const matrice_sym& A):matrice_profil(A.n, A.Profil)//constructeur par copie à partir d'une matrice symétrique
  {
      int d_prof = A.Profil.dim();
      int d_pos = A.Posdiag.dim();
@@ -789,7 +835,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
         }
         else //avant le premier terme non-nul de la ligne
         {
-            cout<<"Coordonnées hors profil"<<endl;
+            cout<<"Coordonnees hors profil"<<endl;
             exit(-1);
 
             /*
@@ -812,7 +858,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
         }
         else//avant le premier terme non-nul de la colonne
         {
-            cout<<"Coordonnées hors profil"<<endl;
+            cout<<"Coordonnees hors profil"<<endl;
             exit(-1);
 
             /*
@@ -973,7 +1019,7 @@ matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B)
 
 matrice_nonsym transpose(const matrice_nonsym& A)
 {
-    matrice_nonsym Res(A.n);
+    matrice_nonsym Res(A.n,A.Profil);
     Res.Upper = A.Lower;
     Res.Lower = A.Upper;
     return Res;
