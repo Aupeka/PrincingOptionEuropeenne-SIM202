@@ -139,6 +139,7 @@ public:
     matrice_sym& operator-(const matrice_sym& A); //On suppose que les matrices ont le même profil
 };
 
+ostream & operator<<(ostream & os, const matrice_sym& A);
 void print(const matrice_sym& A);
 
 matrice_sym operator*(const matrice_sym& A, double a);
@@ -174,6 +175,7 @@ public:
     matrice_nonsym& operator-(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
 };
 
+ostream & operator<<(ostream & os, const matrice_nonsym& A);
 void print(const matrice_nonsym& A);
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a);

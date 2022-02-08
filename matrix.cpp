@@ -599,6 +599,20 @@ matrice_sym& matrice_sym::operator-(const matrice_sym& A)
     return *this;
 }
 
+ostream & operator<<(ostream & os, const matrice_sym& A)
+{
+  for (int i=0; i<A.n; ++i)
+    {
+        os<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            os<<A(i,j)<<",";
+        }
+        os<<A(i,A.n-1)<<"]"<<endl;
+    }
+  return os;
+}
+
 void print(const matrice_sym& A)
 {
     for (int i=0; i<A.n; ++i)
@@ -809,9 +823,9 @@ double matrice_nonsym::operator ()(int i, int j) const //Opérateur de lecture
     }
     else //triangle supérieur
     {
-        if (j>=Profil[i]) //après le premier terme non-nul de la colonne
+        if (i>=Profil[j]) //après le premier terme non-nul de la colonne
         {
-            return Upper[Posdiag[i-1]+(j-Profil[i]+1)];
+            return Upper[Posdiag[j-1]+(i-Profil[j]+1)];
         }
         else//avant le premier terme non-nul de la colonne
         {
@@ -959,6 +973,20 @@ matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
         }
     }
     return *this;
+}
+
+ostream & operator<<(ostream & os, const matrice_nonsym& A)
+{
+  for (int i=0; i<A.n; ++i)
+    {
+        os<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            os<<A(i,j)<<",";
+        }
+        os<<A(i,A.n-1)<<"]"<<endl;
+    }
+  return os;
 }
 
 void print(const matrice_nonsym& A)
