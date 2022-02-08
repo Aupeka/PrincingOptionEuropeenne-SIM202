@@ -115,6 +115,38 @@ vecteur& vecteur::operator /=(double x)
   return *this;
 }
 
+void vecteur::resize(int ni)
+{
+    if (ni<=0)
+    {
+        cout<<"Dimension demandée <=0"<<endl;
+        exit(-1);
+    }
+    if (ni>dim_)
+    {
+        double * temp_ = new double[ni];
+        for (int k=0; k<dim_; ++k)
+        {
+            temp_[k] = val_[k];
+        }
+
+        for (int k=dim_; k<ni; ++k)
+        {
+            temp_[k] = 0.;
+        }
+        dim_ = ni;
+        delete [] val_;
+        val_ = temp_;
+    }
+    else
+    {
+        dim_ = ni;
+        cout<<"Pas besoin de redimensionnement car la taille actuelle >= à la taille demandée"<<endl;
+        exit(-1);
+    }
+}
+
+
 // opérateurs externes
 vecteur operator +(const vecteur & u) //+ unaire (ne fait rien)!
 { return u; }
@@ -411,7 +443,6 @@ Maillage operator+(const Maillage &M1, const Maillage &M2)
 void Maillage::savecoord(const char *fn) const
 {
     ofstream out(fn);
-    out<<sommets.size()<<endl;
     vector<Point>::const_iterator itn=sommets.begin();
     int i=1;
     for(;itn!=sommets.end();itn++,i++)
@@ -424,7 +455,6 @@ void Maillage::savecoord(const char *fn) const
 void Maillage::savenumtri(const char *fn) const
 {
     ofstream out(fn);
-    out<<numelts.size()<<endl;
     list<Numeros>::const_iterator itn=numelts.begin();
     int i=1;
     for(;itn!=numelts.end();itn++,i++)
@@ -442,7 +472,7 @@ matrice::matrice(int mi, int ni, double v) : cols_(0), m(mi), n(ni)
 {
     if (n<0 || m<0)
     {
-        cout<<"dimension négative"<<endl;
+        cout<<"dimension negative"<<endl;
         exit(-1);
     }
     cols_ = new vecteur[n];
@@ -465,7 +495,16 @@ matrice::matrice(const matrice& A): cols_(0), m(A.m), n(A.n)
     }
 }
 
-matrice::~ matrice(){if(cols_!=0) delete [] cols_ ;}
+
+matrice::~matrice()
+{
+    if (cols_!=0)
+    {
+        delete [] cols_;
+    }
+}
+
+
 matrice& matrice::operator=(const matrice& A)
 {
     if ((m!=A.m || n!=A.n) && cols_!=0)
@@ -482,25 +521,852 @@ matrice& matrice::operator=(const matrice& A)
     return *this;
 }
 
-double matrice::val(int i, int j) const {return (cols_[j-1].val_)[i-1];}
-double& matrice::val(int i, int j) {return (cols_[j-1].val_)[i-1];}
-
-vecteur produit(const matrice& A, const vecteur& u)
+double matrice::operator()(int i, int j) const
 {
-    if (A.n!=u.dim_)
+    if (i>m || j>n || i<0 || j<0)
+    {
+        cout <<"Indice en dehors des bornes"<<endl;
+        exit(-1);
+    }
+    return cols_[j][i]; //surcharge du vecteur
+}
+
+double& matrice::operator()(int i, int j)
+{
+    if (i>m || j>n || i<0 || j<0)
+    {
+        cout <<"Indice en dehors des bornes"<<endl;
+        exit(-1);
+    }
+    return cols_[j][i]; //surcharge du vecteur
+}
+
+matrice operator*(const matrice& A, const matrice& B)
+{
+    if (A.n!=B.m)
+    {
+        cout<<"Problèmes de dimensions, produit impossible"<<endl;
+        exit(-1);
+    }
+    int d = A.n;
+    matrice Res(A.m,B.n);
+
+    for (int i=0; i<A.m; ++i)
+    {
+        for (int j=0; j<B.n; ++j)
+        {
+            double res = 0.;
+            for (int k=0; k<d; ++k)
+            {
+                res += A(i,k)*B(k,j);
+            }
+            Res(i,j) = res;
+        }
+    }
+    return Res;
+}
+
+
+vecteur operator*(const matrice& A, const vecteur& u)
+{
+    if (A.n!=u.dim())
     {
         cout<<"produit matrice vecteur : dimensions incompatibles"<<endl;
         exit(-1);
     }
     vecteur Res(A.m,0.);
-    for (int i=1; i<<A.m; ++i)
+    for (int i=1; i<A.m; ++i)
     {
         for (int j=1; j<A.n;++j)
         {
-           Res[i] = A.val(i,j)*u[j];
+           Res[i] = A(i,j)*u[j];
         }
     }
     return Res;
+}
+
+
+matrice transpose(const matrice& A)
+{
+    matrice Res(A.m,A.n);
+    for (int i=0; i<A.m; ++i)
+    {
+        for (int j=0; j<A.n; ++j)
+        {
+            Res(i,j) = A(j,i);
+        }
+    }
+    return Res;
+}
+
+ostream & operator<<(ostream & os, const matrice& A)
+{
+    if (A.cols_!=0)
+    {
+        for (int i=0; i<A.m; ++i)
+        {
+            os<<"[";
+            for (int j=0; j<A.n-1; ++j)
+            {
+                os<<A(i,j)<<",";
+            }
+            os<<A(i,A.n-1)<<"]"<<endl;
+        }
+    }
+    return os;
+}
+
+
+/*
+###################################################"Matrice profil"####################################################
+#######################################################################################################################
+*/
+
+matrice_profil::matrice_profil(int ni, const vecteur Pi) : n(ni), Profil(Pi), Posdiag(0)
+{
+    if (n<0)
+    {
+        cout<<"dimension négative"<<endl;
+        exit(-1);
+    }
+    Posdiag.resize(n);
+    for (int k=1; k<n; ++k) //1er terme est nécessairement sur la diagonale
+    {
+        Posdiag[k] = Posdiag[k-1] + (k-Profil[k]+1); //nombre de terme par ligne ajouté
+    }
+}
+
+
+matrice_profil::matrice_profil(const matrice_profil& A):n(A.n)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    if (d_prof!=0)
+   {
+       Profil = vecteur(d_prof);
+       Posdiag = vecteur(d_pos);
+   }
+   for (int k=0; k<d_prof; ++k)
+   {
+       Profil[k] = A.Profil[k];
+   }
+   for (int k=0; k<d_pos; ++k)
+   {
+       Posdiag[k] = A.Posdiag[k];
+   }
+}
+
+/*
+matrice_profil::~matrice_profil()
+{
+   if (Profil!=0)
+   {
+       delete [] Profil;
+   }
+   if (Posdiag!=0)
+   {
+       delete [] Posdiag;
+   }
+   n=0;
+}
+ */
+
+/*
+ #####################################"Matrice sym"########################################################
+ ##########################################################################################################
+*/
+
+matrice_sym::matrice_sym(int ni, const vecteur Pi) : matrice_profil(ni, Pi), Lower(0)
+{
+    //Lower = vecteur(int(Posdiag[ni-1])+1,0.); //initialisation de longueur connue : dernier terme de Posdiag + 1
+    Lower.resize(int(Posdiag[ni-1])+1);
+}
+
+matrice_sym::matrice_sym(const matrice_sym& A):matrice_profil(A.n,A.Profil)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    int d_low = A.Lower.dim();
+    if (d_prof!=0)
+   {
+       Profil = vecteur(d_prof);
+       Posdiag = vecteur(d_pos);
+       Lower = vecteur(d_low);
+   }
+   for (int k=0; k<d_prof; ++k)
+   {
+       Profil[k] = A.Profil[k];
+   }
+   for (int k=0; k<d_pos; ++k)
+   {
+       Posdiag[k] = A.Posdiag[k];
+   }
+   for (int k=0; k<d_low; ++k)
+   {
+       Lower[k] = A.Lower[k];
+   }
+}
+
+ /*
+ matrice_sym::~matrice_sym()
+ {
+     if (Profil!=0)
+     {
+         delete [] Profil;
+     }
+     if (Posdiag!=0)
+     {
+         delete [] Posdiag;
+     }
+     if (Lower!=0)
+     {
+         delete [] Lower;
+     }
+     n = 0;
+ }
+*/
+
+matrice_sym& matrice_sym::operator=(const matrice_sym& A)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    int d_low = A.Lower.dim();
+    Profil = vecteur(d_prof);
+    Posdiag = vecteur(d_pos);
+    Lower = vecteur(d_low);
+    if (n!=A.n)
+    {
+        n = A.n;
+    }
+    for (int k=0; k<d_prof; ++k)
+    {
+        Profil[k] = A.Profil[k];
+    }
+    for (int k=0; k<d_pos; ++k)
+    {
+        Posdiag[k] = A.Posdiag[k];
+    }
+    for (int k=0; k<d_low; ++k)
+    {
+        Lower[k] = A.Lower[k];
+    }
+    return *this;
+}
+
+double matrice_sym::operator()(int i, int j) const //Opérateur de lecture
+{
+    if (i==j)
+    {
+        return Lower[Posdiag[i]];
+    }
+    if (i<j) //triangle supérieur
+    {
+        int temp = j;
+        j = i;
+        i = temp;
+    }
+    //code pour le triangle inférieur : i>j mais inversion indice permet de tout traiter
+    if (j>=Profil[i]) //après le premier terme non-nul de la ligne
+    {
+        return Lower[Posdiag[i-1]+(j-Profil[i]+1)];
+    }
+    else //avant le premier terme non-nul de la ligne
+    {
+        return 0.;
+    }
+}
+
+
+double& matrice_sym::operator()(int i, int j) //Lecture et écriture
+{
+    if (i==j)
+    {
+        return Lower[Posdiag[i]]; //n'incrémente que dans le lower
+    }
+    if (i<j) //triangle supérieur
+    {
+        int temp = j;
+        j=i;
+        i=temp;
+    }
+    //code pour le triangle inférieur : i>j mais inversion indice permet de tout traiter
+    if (j>=Profil[i]) //après le premier terme non-nul de la ligne
+    {
+        return Lower[Posdiag[i-1]+(j-Profil[i]+1)];
+    }
+    else //avant le premier terme non-nul de la ligne
+    {
+        cout<<"Coordonnees hors profil"<<endl;
+        exit(-1);
+
+        /*
+        //On doit l'ajouter au bon endroit
+        for (int k=j; k<Profil[i];++k)//termes à rajouter
+        {
+            Lower.add(Posdiag[i-1]+k+1,0.); //rajoute des 0 entre le nouveau point à écrire et celui existant
+            Posdiag[i]+=1;//décale le terme diagonal de la ligne à chaque ajout d'un terme
+        }
+        Profil[i]=j; //nouveau premier terme non-nul
+        return Lower[Posdiag[i-1]+Profil[i]+1];
+        */
+    }
+}
+
+matrice_sym& matrice_sym::operator*(double a)
+{
+    Lower*=a;
+    return *this;
+}
+
+matrice_sym& matrice_sym::operator/(double a)
+{
+    if (a==0.)
+    {
+        cout<<"division par zéro"<<endl;
+        exit(-1);
+    }
+    Lower/=a;
+    return *this;
+}
+
+
+matrice_sym& matrice_sym::operator+(const matrice_sym& A)
+{
+    if (n!=A.n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<n; ++i)
+    {
+        (*this)(i,i)+=A(i,i);
+
+        for (int j=A.Profil[i]; j<Posdiag[i]; ++j) //du premier non-nul jusqu'à la diagonale exclu
+        {
+            (*this)(i,j)+=A(i,j);
+        }
+
+        /*
+        if (A.profil[i]>=profil[i])//A n'enlève pas de 0 sur cette ligne
+        {
+            for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
+            {
+                (this)[i,j]+=A[i,j];
+                (this)[j,i]+=A[j,i];
+                //Lower[Posdiag[i-1]+j+1]+=A.Lower[A.Posdiag[i-1]+j+1];
+                //Upper[Posdiag[i-1]+j+1]+=A.Upper[A.Posdiag[i-1]+j+1];
+            }
+        }
+        else//A modifie la ligne
+        {
+            for (int j=A.profil[i]; j<i; ++j)
+            {
+                (this)[i,j]+=A[i,j];
+                (this)[j,i]+=A[j,i];
+                //
+            }
+        }
+        */
+    }
+    return *this;
+}
+
+matrice_sym& matrice_sym::operator-(const matrice_sym& A)
+{
+    if (n!=A.n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<n; ++i)
+    {
+        (*this)(i,i)-=A(i,i);
+
+        for (int j=A.Profil[i]; j<Posdiag[i]; ++j) //du premier non-nul jusqu'à la diagonale exclu
+        {
+            (*this)(i,j)-=A(i,j);
+        }
+    }
+    return *this;
+}
+
+ostream & operator<<(ostream & os, const matrice_sym& A)
+{
+  for (int i=0; i<A.n; ++i)
+    {
+        os<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            os<<A(i,j)<<",";
+        }
+        os<<A(i,A.n-1)<<"]"<<endl;
+    }
+  return os;
+}
+
+void print(const matrice_sym& A)
+{
+    for (int i=0; i<A.n; ++i)
+    {
+        cout<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            cout<<A(i,j)<<",";
+        }
+        cout<<A(i,A.n-1)<<"]"<<endl;
+    }
+}
+
+matrice_sym operator*(const matrice_sym& A, double a)
+{
+    return matrice_sym(A)*a;
+}
+
+matrice_sym operator*(double a, const matrice_sym& A)
+{
+    return matrice_sym(A)*a;
+}
+
+vecteur operator*(const matrice_sym& A, const vecteur& V)
+{
+    if (A.n!=V.dim())
+    {
+        cout<<"La matrice n'a pas la même dimension que le vecteur"<<endl;
+        exit(-1);
+    }
+    vecteur Res(A.n);
+    for (int k=0;k<A.n;++k)
+    {
+        for (int i=0; i<A.n; ++i)
+        {
+            Res[k]+=A(k,i)*V[i];
+        }
+    }
+    return Res;
+}
+
+matrice_sym operator/(const matrice_sym& A, double a)
+{
+    return matrice_sym(A)/a;
+}
+
+matrice_sym operator+(const matrice_sym& A, const matrice_sym& B)
+{
+    return matrice_sym(A)+B;
+}
+
+matrice_sym operator-(const matrice_sym& A, const matrice_sym& B)
+{
+    return matrice_sym(A)-B;
+}
+
+matrice_sym transpose(const matrice_sym& A)
+{
+    return matrice_sym(A);
+}
+
+/*
+#####################################"Matrice non sym"#####################################################
+###########################################################################################################
+*/
+
+ matrice_nonsym::matrice_nonsym(int ni, const vecteur Pi) : matrice_profil(ni, Pi), Lower(0), Upper(0)
+ {
+    //Lower = vecteur(int(Posdiag[ni-1])+1,0.); //initialisation de longueur connue : dernier terme de Posdiag + 1
+    //Upper = vecteur(int(Posdiag[ni-1])+1,0.);
+    Lower.resize(int(Posdiag[ni-1])+1);
+    Upper.resize(int(Posdiag[ni-1])+1);
+ }
+
+ matrice_nonsym::matrice_nonsym(const matrice_nonsym& A):matrice_profil(A.n,A.Profil)
+ {
+     int d_prof = A.Profil.dim();
+     int d_pos = A.Posdiag.dim();
+     int d_low = A.Lower.dim();
+     int d_up = A.Upper.dim();
+     if (d_prof!=0)
+    {
+        Profil = vecteur(d_prof);
+        Posdiag = vecteur(d_pos);
+        Lower = vecteur(d_low);
+        Upper = vecteur(d_up);
+    }
+    for (int k=0; k<d_prof; ++k)
+    {
+        Profil[k] = A.Profil[k];
+    }
+    for (int k=0; k<d_pos; ++k)
+    {
+        Posdiag[k] = A.Posdiag[k];
+    }
+    for (int k=0; k<d_low; ++k)
+    {
+        Lower[k] = A.Lower[k];
+    }
+    for (int k=0; k<d_up; ++k)
+    {
+        Upper[k] = A.Upper[k];
+    }
+ }
+
+ matrice_nonsym::matrice_nonsym(const matrice_sym& A):matrice_profil(A.n, A.Profil)//constructeur par copie à partir d'une matrice symétrique
+ {
+     int d_prof = A.Profil.dim();
+     int d_pos = A.Posdiag.dim();
+     int d_low = A.Lower.dim();
+     if (d_prof!=0)
+    {
+        Profil = vecteur(d_prof);
+        Posdiag = vecteur(d_pos);
+        Lower = vecteur(d_low);
+        Upper = vecteur(d_low);
+    }
+    for (int k=0; k<d_prof; ++k)
+    {
+        Profil[k] = A.Profil[k];
+    }
+    for (int k=0; k<d_pos; ++k)
+    {
+        Posdiag[k] = A.Posdiag[k];
+    }
+    for (int k=0; k<d_low; ++k)
+    {
+        Lower[k] = A.Lower[k];
+    }
+    for (int k=0; k<d_low; ++k)
+    {
+        Upper[k] = A.Lower[k]; //Upper est identique à Lower
+    }
+ }
+
+ /*
+ matrice_nonsym::~matrice_nonsym()
+ {
+     if (Profil!=0)
+     {
+         delete [] Profil;
+     }
+     if (Posdiag!=0)
+     {
+         delete [] Posdiag;
+     }
+     if (Lower!=0)
+     {
+         delete [] Lower;
+     }
+     if (Upper!=0)
+     {
+         delete [] Upper;
+     }
+     n = 0;
+ }
+ */
+
+matrice_nonsym& matrice_nonsym::operator=(const matrice_nonsym& A)
+{
+    int d_prof = A.Profil.dim();
+    int d_pos = A.Posdiag.dim();
+    int d_low = A.Lower.dim();
+    int d_up = A.Upper.dim();
+    Profil = vecteur(d_prof);
+    Posdiag = vecteur(d_pos);
+    Lower = vecteur(d_low);
+    Upper = vecteur(d_up);
+    if (n!=A.n)
+    {
+        n = A.n;
+    }
+    for (int k=0; k<d_prof; ++k)
+    {
+        Profil[k] = A.Profil[k];
+    }
+    for (int k=0; k<d_pos; ++k)
+    {
+        Posdiag[k] = A.Posdiag[k];
+    }
+    for (int k=0; k<d_low; ++k)
+    {
+        Lower[k] = A.Lower[k];
+    }
+    for (int k=0; k<d_up; ++k)
+    {
+        Upper[k] = A.Upper[k];
+    }
+    return *this;
+}
+
+double matrice_nonsym::operator ()(int i, int j) const //Opérateur de lecture
+{
+    if (i==j)
+    {
+        return Lower[Posdiag[i]];
+    }
+    if (i>j) //triangle inférieur
+    {
+        if (j>=Profil[i]) //après le premier terme non-nul de la ligne
+        {
+            return Lower[Posdiag[i-1]+(j-Profil[i]+1)];
+        }
+        else //avant le premier terme non-nul de la ligne
+        {
+            return 0.;
+        }
+    }
+    else //triangle supérieur
+    {
+        if (i>=Profil[j]) //après le premier terme non-nul de la colonne
+        {
+            return Upper[Posdiag[j-1]+(i-Profil[j]+1)];
+        }
+        else//avant le premier terme non-nul de la colonne
+        {
+            return 0.;
+        }
+    }
+}
+
+
+double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
+{
+    if (i==j)
+    {
+        return Lower[Posdiag[i]]; //n'incrémente que dans le lower
+    }
+    if (i>j) //triangle inférieur
+    {
+        if (j>=Profil[i]) //après le premier terme non-nul de la ligne
+        {
+            return Lower[Posdiag[i-1]+(j-Profil[i]+1)];
+        }
+        else //avant le premier terme non-nul de la ligne
+        {
+            cout<<"Coordonnees hors profil"<<endl;
+            exit(-1);
+
+            /*
+            //On doit l'ajouter au bon endroit
+            for (int k=j; k<Profil[i];++k)//termes à rajouter
+            {
+                Lower.add(Posdiag[i-1]+k+1,0.); //rajoute des 0 entre le nouveau point à écrire et celui existant
+                Posdiag[i]+=1;//décale le terme diagonal de la ligne à chaque ajout d'un terme
+            }
+            Profil[i]=j; //nouveau premier terme non-nul
+            return Lower[Posdiag[i-1]+Profil[i]+1];
+            */
+        }
+    }
+    else //triangle supérieur
+    {
+        if (i>=Profil[j]) //après le premier terme non-nul de la colonne
+        {
+            return Upper[Posdiag[j-1]+(i-Profil[j]+1)];
+        }
+        else//avant le premier terme non-nul de la colonne
+        {
+            cout<<"Coordonnees hors profil"<<endl;
+            exit(-1);
+
+            /*
+            //On doit l'ajouter au bon endroit
+            for (int k=j; k<Profil[i];++k)//termes à rajouter
+            {
+                Upper.add(Posdiag[i-1]+k+1,0.); //rajoute des 0 entre le nouveau point à écrire et celui existant
+                Posdiag[i]+=1;//décale le terme diagonal de la ligne à chaque ajout d'un terme
+            }
+            Profil[i]=j; //nouveau premier terme non-nul
+            return Upper[Posdiag[i-1]+Profil[i]+1];
+            */
+        }
+    }
+}
+
+matrice_nonsym& matrice_nonsym::operator*(double a)
+{
+    Lower*=a;
+    Upper*=a;
+    return *this;
+}
+
+
+matrice_nonsym& matrice_nonsym::operator/(double a)
+{
+    if (a==0.)
+    {
+        cout<<"division par zéro"<<endl;
+        exit(-1);
+    }
+    Lower/=a;
+    Upper/=a;
+    return *this;
+}
+
+matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
+{
+    if (n!=A.n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<n; ++i)
+    {
+        (*this)(i,i)+=A(i,i); //n'incrémente que dans le lower
+        //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
+        Upper[Posdiag[i]]+=A.Upper[Posdiag[i]];
+
+        for (int j=A.Profil[i]; j<Posdiag[i]; ++j) //du premier non-nul jusqu'à la diagonale exclu
+        {
+            (*this)(i,j)+=A(i,j); //modification de Lower
+            (*this)(j,i)+=A(j,i);//modification de Upper
+        }
+
+        /*
+        if (A.profil[i]>=profil[i])//A n'enlève pas de 0 sur cette ligne
+        {
+            for (int j=A.Profil[i]; j<i; ++j) //du premier non-nul jusqu'à la diagonale exclu
+            {
+                (this)[i,j]+=A[i,j];
+                (this)[j,i]+=A[j,i];
+                //Lower[Posdiag[i-1]+j+1]+=A.Lower[A.Posdiag[i-1]+j+1];
+                //Upper[Posdiag[i-1]+j+1]+=A.Upper[A.Posdiag[i-1]+j+1];
+            }
+        }
+        else//A modifie la ligne
+        {
+            for (int j=A.profil[i]; j<i; ++j)
+            {
+                (this)[i,j]+=A[i,j];
+                (this)[j,i]+=A[j,i];
+                //
+            }
+        }
+        */
+    }
+    return *this;
+}
+
+matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
+{
+    if (n!=A.n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<n; ++i)
+    {
+        (*this)(i,i)-=A(i,i); //n'incrémente que dans le lower
+        //Lower[Posdiag[i]]+=A.Lower[Posdiag[i]];
+        Upper[Posdiag[i]]-=A.Upper[Posdiag[i]];
+
+        for (int j=A.Profil[i]; j<Posdiag[i]; ++j) //du premier non-nul jusqu'à la diagonale exclu
+        {
+            (*this)(i,j)-=A(i,j);
+            (*this)(j,i)-=A(j,i);
+        }
+    }
+    return *this;
+}
+
+ostream & operator<<(ostream & os, const matrice_nonsym& A)
+{
+  for (int i=0; i<A.n; ++i)
+    {
+        os<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            os<<A(i,j)<<",";
+        }
+        os<<A(i,A.n-1)<<"]"<<endl;
+    }
+  return os;
+}
+
+void print(const matrice_nonsym& A)
+{
+    for (int i=0; i<A.n; ++i)
+    {
+        cout<<"[";
+        for (int j=0; j<A.n-1; ++j)
+        {
+            cout<<A(i,j)<<",";
+        }
+        cout<<A(i,A.n-1)<<"]"<<endl;
+    }
+}
+
+matrice_nonsym operator*(const matrice_nonsym& A, double a)
+{
+    return matrice_nonsym(A)*a;
+}
+
+matrice_nonsym operator*(double a, const matrice_nonsym& A)
+{
+    return matrice_nonsym(A)*a;
+}
+
+vecteur operator*(const matrice_nonsym& A, const vecteur& V)
+{
+    if (A.n!=V.dim())
+    {
+        cout<<"La matrice n'a pas la même dimension que le vecteur"<<endl;
+        exit(-1);
+    }
+    vecteur Res(A.n);
+    for (int k=0;k<A.n;++k)
+    {
+        for (int i=0; i<A.n; ++i)
+        {
+            Res[k]+=A(k,i)*V[i];
+        }
+    }
+    return Res;
+}
+
+matrice_nonsym operator/(const matrice_nonsym& A, double a)
+{
+    return matrice_nonsym(A)/a;
+}
+
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B)
+{
+    return matrice_nonsym(A)+B;
+}
+
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B)
+{
+    return matrice_nonsym(A)-B;
+}
+
+matrice_nonsym transpose(const matrice_nonsym& A)
+{
+    matrice_nonsym Res(A.n,A.Profil);
+    Res.Upper = A.Lower;
+    Res.Lower = A.Upper;
+    return Res;
+}
+
+/*
+###########################"Opérations mixtes"############################################
+##########################################################################################
+*/
+
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B)
+{
+    return matrice_nonsym(B)+A;
+}
+
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B)
+{
+    return matrice_nonsym(B)-A;
+}
+
+matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B)
+{
+    return matrice_nonsym(A)+B;
+}
+
+matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B)
+{
+    return matrice_nonsym(A)-B;
 }
 
 void LUdecomposition(const matrice& A,matrice& l,matrice& u, int n)
@@ -509,27 +1375,136 @@ void LUdecomposition(const matrice& A,matrice& l,matrice& u, int n)
    for (i = 1; i < n+1; i++) {
       for (j = 1; j < n+1; j++) {
          if (j < i)
-         l.val(j,i) = 0;
+         l(j,i) = 0;
          else {
-            l.val(j,i) = A.val(i,j);
+            l(j,i) = A(i,j);
             for (k = 1; k < i+1; k++) {
-               l.val(j,i) = l.val(j,i) - l.val(j,k) * u.val(k,i);
+               l(j,i) = l(j,i) - l(j,k) * u(k,i);
             }
          }
       }
       for (j = 1; j < n+1; j++) {
          if (j < i)
-         u.val(i,j) = 0;
+         u(i,j) = 0;
          else if (j == i)
-         u.val(i,j) = 1;
+         u(i,j) = 1;
          else {
-            u.val(i,j) = A.val(i,j) / l.val(i,i);
+            u(i,j) = A(i,j) / l(i,i);
             for (k = 1; k < i+1; k++) {
-               u.val(i,j) = u.val(i,j) - ((l.val(i,k) * u.val(k,j)) / l.val(i,i));
+               u(i,j) = u(i,j) - ((l(i,k) * u(k,j)) / l(i,i));
             }
          }
       }
    }
 }
+
+
+/*#####################################Matrice éléments finis##########################
+*/
+
+
+matrice_sym matM_elem(const Point& P1,const Point& P2,const Point& P3)
+{
+    double x1 = P1.x;
+    double y1 = P1.y;
+    double x2 = P2.x;
+    double y2 = P2.y;
+    double x3 = P3.x;
+    double y3 = P3.y;
+
+    double D = ((x2-x1)*(y3-y1) - (y2-y1)*(x3-x1));
+    vecteur profil(3);
+    matrice_sym Mel(3,profil);
+    for (int i=0;i<3;++i)
+    {
+        for (int j=0;i<3;++j)
+        {
+            if (i==j)
+            {
+                Mel(i,j)=abs(D)/12;
+            }
+            else
+            {
+                Mel(i,j)=abs(D)/24;
+            }
+        }
+    }
+    return(Mel);
+
+}
+
+matrice_sym MatK_elem(const Point& P1,const Point& P2,const Point& P3)
+{
+    double x1 = P1.x;
+    double y1 = P1.y;
+    double x2 = P2.x;
+    double y2 = P2.y;
+    double x3 = P3.x;
+    double y3 = P3.y;
+
+    double D = ((x2-x1)*(y3-y1) - (y2-y1)*(x3-x1));
+    matrice norm(3,2);
+    norm(0,0)=y2-y3;
+    norm(0,1)=x3-x2;
+    norm(1,0)=y3-y1;
+    norm(1,1)=x1-x3;
+    norm(2,0)=y1-y2;
+    norm(2,1)=x2-x1;
+    vecteur profil(3);
+    matrice_sym Kel(3,profil);
+
+    Kel=(A(x1+(x2-x1)/6+(x3-x1)/6,y1+(y2-y1)/6+(y3-y1)/6)/6 + A(x1+(x2-x1)*2/3+(x3-x1)/6,y1+(y2-y1)*2/3+(y3-y1)/6)/6 + A(x1+(x2-x1)/6+(x3-x1)*2/3,y1+(y2-y1)/6+(y3-y1)*2/3)/6)*norm*transpose(norm)/(3*abs(D));
+}
+
+
+matrice A(const Point& P)
+{
+    x1=P.x;
+    x2=P.y;
+    matrice A(2,2);
+    A(0,0)=0.5*0.04*x1*x1;
+    A(0,1)=0.5*(-0.024)*x1*x2;
+    A(1,0)=0.5*(-0.024)*x1*x2;
+    A(1,1)=0.5*0.04*x2*x2;
+    return(A);
+}
+
+vecteur V(const Point& P)
+{
+    x1=P.x;
+    x2=P.y;
+    V[0]=(0.04+0.5*(-0.024)-0.05)*x1;
+    V[1]=(0.04+0.5*(-0.024)-0.05)*x2;
+    return(V);
+}
+
+matrice_nonsym MatB_elem(const Point& P1,const Point& P2,const Point& P3)
+{
+    double x1 = P1.x;
+    double y1 = P1.y;
+    double x2 = P2.x;
+    double y2 = P2.y;
+    double x3 = P3.x;
+    double y3 = P3.y;
+
+    double D = ((x2-x1)*(y3-y1) - (y2-y1)*(x3-x1));
+    matrice norm(3,2);
+    norm(0,0)=y2-y3;
+    norm(0,1)=x3-x2;
+    norm(1,0)=y3-y1;
+    norm(1,1)=x1-x3;
+    norm(2,0)=y1-y2;
+    norm(2,1)=x2-x1;
+
+
+
+    vecteur profil(3);
+    matrice_sym Bel(3,profil);
+}
+
+
+
+
+
 
 
