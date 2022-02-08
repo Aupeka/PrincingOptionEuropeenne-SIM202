@@ -243,13 +243,13 @@ ostream & operator<<(ostream & os, const vecteur & u)
 /*
 ############################"Classe Matrice"###########################
 #######################################################################
-
+*/
 
 matrice::matrice(int mi, int ni, double v) : cols_(0), m(mi), n(ni)
 {
-    if (n>0 || m<0)
+    if (n<0 || m<0)
     {
-        cout<<"dimension négative"<<endl;
+        cout<<"dimension negative"<<endl;
         exit(-1);
     }
     cols_ = new vecteur[n];
@@ -271,6 +271,16 @@ matrice::matrice(const matrice& A): cols_(0), m(A.m), n(A.n)
         cols_[j] = A.cols_[j];
     }
 }
+
+
+matrice::~matrice()
+{
+    if (cols_!=0)
+    {
+        delete [] cols_;
+    }
+}
+
 
 matrice& matrice::operator=(const matrice& A)
 {
@@ -308,7 +318,33 @@ double& matrice::operator()(int i, int j)
     return cols_[j][i]; //surcharge du vecteur
 }
 
-vecteur produit(const matrice& A, const vecteur& u)
+matrice operator*(const matrice& A, const matrice& B)
+{
+    if (A.n!=B.m)
+    {
+        cout<<"Problèmes de dimensions, produit impossible"<<endl;
+        exit(-1);
+    }
+    int d = A.n;
+    matrice Res(A.m,B.n);
+
+    for (int i=0; i<A.m; ++i)
+    {
+        for (int j=0; j<B.n; ++j)
+        {
+            double res = 0.;
+            for (int k=0; k<d; ++k)
+            {
+                res += A(i,k)*B(k,j);
+            }
+            Res(i,j) = res;
+        }
+    }
+    return Res;
+}
+
+
+vecteur operator*(const matrice& A, const vecteur& u)
 {
     if (A.n!=u.dim())
     {
@@ -327,6 +363,37 @@ vecteur produit(const matrice& A, const vecteur& u)
 }
 
 
+matrice transpose(const matrice& A)
+{
+    matrice Res(A.m,A.n);
+    for (int i=0; i<A.m; ++i)
+    {
+        for (int j=0; j<A.n; ++j)
+        {
+            Res(i,j) = A(j,i);
+        }
+    }
+    return Res;
+}
+
+ostream & operator<<(ostream & os, const matrice& A)
+{
+    if (A.cols_!=0)
+    {
+        for (int i=0; i<A.m; ++i)
+        {
+            os<<"[";
+            for (int j=0; j<A.n-1; ++j)
+            {
+                os<<A(i,j)<<",";
+            }
+            os<<A(i,A.n-1)<<"]"<<endl;
+        }
+    }
+    return os;
+}
+
+/*
 ###################################################"Matrice profil"####################################################
 #######################################################################################################################
 */

@@ -82,7 +82,7 @@ ostream & operator<<(ostream & os, const vecteur & u);   // os << u
 /*
 ##########################"Classe Matrice"####################################
 ##############################################################################
-
+*/
 
 class matrice
 {
@@ -97,9 +97,12 @@ public:
     double& operator()(int i, int j);
 };
 
-vecteur produit(const matrice& A, const vecteur& u);
+vecteur operator*(const matrice& A, const vecteur& u);
+matrice operator*(const matrice& A, const matrice& B);
+matrice transpose(const matrice& A);
+ostream & operator<<(ostream & os, const matrice& A);
 
-
+/*
 ####################################"Matrice profil"##################################
 ######################################################################################
 */
