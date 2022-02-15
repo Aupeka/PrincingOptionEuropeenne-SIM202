@@ -1,4 +1,5 @@
 #include "Projet.hpp"
+#include "matrix.hpp"
 #include <iostream>
 #include <fstream>
 #include <math.h>
