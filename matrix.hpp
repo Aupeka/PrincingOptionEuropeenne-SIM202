@@ -95,7 +95,17 @@ public:
     matrice& operator=(const matrice& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
+    matrice& operator*(double a);
+    matrice& operator/(double a);
+    matrice& operator+(const matrice& A);
+    matrice& operator-(const matrice& A);
 };
+
+matrice operator*(const matrice& A, double a);
+matrice operator/(const matrice& A, double a);
+matrice operator*(double a, const matrice& A);
+matrice operator+(const matrice& A, const matrice& B);
+matrice operator-(const matrice& A, const matrice& B);
 
 vecteur operator*(const matrice& A, const vecteur& u);
 matrice operator*(const matrice& A, const matrice& B);

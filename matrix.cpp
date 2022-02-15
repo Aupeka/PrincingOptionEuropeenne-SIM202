@@ -318,6 +318,94 @@ double& matrice::operator()(int i, int j)
     return cols_[j][i]; //surcharge du vecteur
 }
 
+matrice& matrice::operator*(double a)
+{
+    for (int i=0; i<m; i++)
+    {
+        for (int j=0; j<n; ++j)
+        {
+            (*this)(i,j)*=a;
+        }
+    }
+    return (*this);
+}
+
+matrice& matrice::operator/(double a)
+{
+    if (a==0)
+    {
+        cout<<"Division par zéro"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<m; i++)
+    {
+        for (int j=0; j<n; ++j)
+        {
+            (*this)(i,j)/=a;
+        }
+    }
+    return (*this);
+}
+
+matrice& matrice::operator+(const matrice& A)
+{
+    if (A.m!=m || A.n!=n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<m; i++)
+    {
+        for (int j=0; j<n; ++j)
+        {
+            (*this)(i,j)+=A(i,j);
+        }
+    }
+    return (*this);
+}
+
+matrice& matrice::operator-(const matrice& A)
+{
+    if (A.m!=m || A.n!=n)
+    {
+        cout<<"Les matrices ne sont pas de mêmes dimensions"<<endl;
+        exit(-1);
+    }
+    for (int i=0; i<m; i++)
+    {
+        for (int j=0; j<n; ++j)
+        {
+            (*this)(i,j)-=A(i,j);
+        }
+    }
+    return (*this);
+}
+
+matrice operator*(const matrice& A, double a)
+{
+    return matrice(A)*a;
+}
+
+matrice operator/(const matrice& A, double a)
+{
+    return matrice(A)/a;
+}
+
+matrice operator*(double a, const matrice& A)
+{
+    return matrice(A)*a;
+}
+
+matrice operator+(const matrice& A, const matrice& B)
+{
+    return matrice(A)+B;
+}
+
+matrice operator-(const matrice& A, const matrice& B)
+{
+    return matrice(A)-B;
+}
+
 matrice operator*(const matrice& A, const matrice& B)
 {
     if (A.n!=B.m)
@@ -1281,7 +1369,7 @@ matrice_nonsym LUdecomposition(const matrice_nonsym& A)
             cout<<"Erreur : Matrice non-factorisable"<<endl;
             exit(-1);
         }
-        for (int i=p; i<n; i++) //boucle sur la matrice triangulaire inférieure
+        for (int i=p+1; i<n; i++) //boucle sur la matrice triangulaire inférieure
         {
             if (p>=lu.Profil[i])
             {
