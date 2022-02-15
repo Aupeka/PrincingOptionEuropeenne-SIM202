@@ -1501,6 +1501,7 @@ matrice A(const Point& P)
 
 vecteur V(const Point& P)
 {
+    vecteur V(2);
     double x1=P.x;
     double x2=P.y;
     V[0]=(0.04+0.5*(-0.024)-0.05)*x1;
