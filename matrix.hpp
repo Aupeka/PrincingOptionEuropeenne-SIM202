@@ -202,5 +202,14 @@ matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B); //On su
 matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
 matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
 
+/*
+################################ancienne version############################################
+
+void LUdecomposition(const matrice& A);
+//void LUdecomposition(const matrice_sym& A,matrice& l,matrice& u, int n);
+//void LUdecomposition(const matrice_nonsym& A,matrice& l,matrice& u, int n);
+*/
+matrice_nonsym LUdecomposition(const matrice_nonsym& A);
+matrice_nonsym LUdecomposition(const matrice_sym& A);
 
 #endif

@@ -572,7 +572,7 @@ double& matrice_sym::operator()(int i, int j) //Lecture et écriture
     }
     else //avant le premier terme non-nul de la ligne
     {
-        cout<<"Coordonnees hors profil"<<endl;
+        cout<<"("<<i<<","<<j<<")"<<": Coordonnees hors profil"<<endl;
         exit(-1);
 
         /*
@@ -875,7 +875,7 @@ double matrice_nonsym::operator ()(int i, int j) const //Opérateur de lecture
 {
     if (i==j)
     {
-        return Lower[Posdiag[i]];
+        return Upper[Posdiag[i]];
     }
     if (i>j) //triangle inférieur
     {
@@ -906,7 +906,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
 {
     if (i==j)
     {
-        return Lower[Posdiag[i]]; //n'incrémente que dans le lower
+        return Upper[Posdiag[i]]; //n'incrémente que dans le Upper (mieux que dans Lower à cause de la factorisation LU)
     }
     if (i>j) //triangle inférieur
     {
@@ -916,7 +916,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
         }
         else //avant le premier terme non-nul de la ligne
         {
-            cout<<"Coordonnees hors profil"<<endl;
+            cout<<"("<<i<<","<<j<<")"<<": Coordonnees hors profil"<<endl;
             exit(-1);
 
             /*
@@ -939,7 +939,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
         }
         else//avant le premier terme non-nul de la colonne
         {
-            cout<<"Coordonnees hors profil"<<endl;
+            cout<<"("<<i<<","<<j<<")"<<": Coordonnees hors profil"<<endl;
             exit(-1);
 
             /*
@@ -1143,4 +1143,161 @@ matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B)
 matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B)
 {
     return matrice_nonsym(A)-B;
+}
+
+/*
+matrice_nonsym LUdecomposition(const matrice_sym& A)
+{
+   int n = A.n;
+   matrice_nonsym LU(n,A.Profil);
+   //int i = 1, j = 1, k = 1;
+   for (int i = 1; i < n+1; i++)
+   {
+       for (int j = 1; j < n+1; j++)
+       {
+           if (i>=j)
+           {
+               LU(j,i) = A(i,j);
+                for (int k = 1; k < i+1; k++)
+                {
+                    LU(j,i) = LU(j,i) - LU(j,k) * LU(k,i);
+                }
+           }
+       }
+       for (int j = 1; j < n+1; j++)
+       {
+           if (j==i)
+           {
+               LU(i,j)=1;
+           }
+           else if (j>i)
+           {
+               LU(i,j) = A(i,j) / LU(i,i);
+               for (int k = 1; k < i+1; k++)
+               {
+                   LU(i,j) = LU(i,j) - ((LU(i,k) * LU(k,j)) / LU(i,i));
+               }
+           }
+       }
+   }
+}
+*/
+/*
+################################ancienne version############################################
+
+void LUdecomposition(const matrice& A)
+{
+   int n = A.n;
+   matrice l(n,n);
+   matrice u(n,n);
+   //int i = 1, j = 1, k = 1;
+   for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+         if (i < j)
+         l(i,j) = 0;
+         else if (i==j)
+         {
+             l(i,i) = 1;
+         }
+         else {
+            l(i,j) = A(i,j);
+            for (int k = 0; k < i; k++) {
+               l(i,j) -= l(i,k) * u(k,j);
+            }
+         }
+      }
+      for (int j = 0; j < n; j++) {
+         if (i > j)
+         u(i,j) = 0;
+         //else if (j == i)
+         //u(i,j) = 1;
+         else {
+            u(i,j) = A(i,j) / l(i,i);
+            for (int k = 0; k < i; k++) {
+               u(i,j) -= ((l(i,k) * u(k,j)) / l(i,i));
+            }
+         }
+      }
+   }
+   cout<<u<<endl;
+   cout<<l<<endl;
+}
+
+void LUdecomposition(const matrice_nonsym& A,matrice& l,matrice& u, int n)
+{
+   int i = 1, j = 1, k = 1;
+   for (i = 1; i < n+1; i++) {
+      for (j = 1; j < n+1; j++) {
+         if (j < i)
+         l(j,i) = 0;
+         else {
+            l(j,i) = A(i,j);
+            for (k = 1; k < i+1; k++) {
+               l(j,i) = l(j,i) - l(j,k) * u(k,i);
+            }
+         }
+      }
+      for (j = 1; j < n+1; j++) {
+         if (j < i)
+         u(i,j) = 0;
+         else if (j == i)
+         u(i,j) = 1;
+         else {
+            u(i,j) = A(i,j) / l(i,i);
+            for (k = 1; k < i+1; k++) {
+               u(i,j) = u(i,j) - ((l(i,k) * u(k,j)) / l(i,i));
+            }
+         }
+      }
+   }
+}
+
+*/
+
+matrice_nonsym LUdecomposition(const matrice_nonsym& A)
+{
+    int n=A.n;
+    matrice_nonsym lu(n,A.Profil); //Utilise la conservation du profil p
+    for (int i=0; i<n; i++)
+    {
+        lu.Lower[lu.Posdiag[i]] = 1;//mets diagonale lower à 0 car accesseur classique rempli Upper et non lower
+    }
+    for (int p=0; p<n; p++)
+    {
+        for (int j=p; j<n; j++) //boucle sur la matrice triangulaire supérieure
+        {
+            if (p>=lu.Profil[j]) //ne modifie que les termes dans le profil
+            {
+                lu(p,j) = A(p,j);
+                for (int k=lu.Profil[p]; k<p-1; k++)
+                {
+                    lu(p,j) -= lu(p,k)*lu(k,j);
+                }
+            }
+        }
+        if (lu(p,p)==0)
+        {
+            cout<<lu<<endl;
+            cout<<"Erreur : Matrice non-factorisable"<<endl;
+            exit(-1);
+        }
+        for (int i=p; i<n; i++) //boucle sur la matrice triangulaire inférieure
+        {
+            if (p>=lu.Profil[i])
+            {
+                lu(i,p) = A(i,p);
+                for (int k=0; k<p-1; k++)
+                {
+                    lu(i,p) -= lu(i,k)*lu(k,p);
+                }
+                lu(i,p) /= lu(p,p);
+            }
+        }
+    }
+    return lu;
+}
+
+matrice_nonsym LUdecomposition(const matrice_sym& A)
+{
+    return LUdecomposition(matrice_nonsym(A));
 }
