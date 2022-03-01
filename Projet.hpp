@@ -186,7 +186,17 @@ public:
     matrice& operator=(const matrice& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
+    matrice& operator*(double a);
+    matrice& operator/(double a);
+    matrice& operator+(const matrice& A);
+    matrice& operator-(const matrice& A);
 };
+
+matrice operator*(const matrice& A, double a);
+matrice operator/(const matrice& A, double a);
+matrice operator*(double a, const matrice& A);
+matrice operator+(const matrice& A, const matrice& B);
+matrice operator-(const matrice& A, const matrice& B);
 
 vecteur operator*(const matrice& A, const vecteur& u);
 matrice operator*(const matrice& A, const matrice& B);
@@ -291,6 +301,20 @@ matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B); //On su
 matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
 matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
 matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym LUdecomposition(const matrice_nonsym& A);
+matrice_nonsym LUdecomposition(const matrice_sym& A);
+vecteur resolsys(const matrice_nonsym A, const vecteur b);
 
+
+
+/*#######################"Matrices éléments finis"####################################
+##############################################################################"#####
+*/
+
+matrice matM_elem(const Point& P1,const Point& P2,const Point& P3);
+matrice matK_elem(const Point& P1,const Point& P2,const Point& P3);
+matrice A(const Point& P);
+vecteur V(const Point& P);
+matrice matB_elem(const Point& P1,const Point& P2,const Point& P3);
 
 #endif
