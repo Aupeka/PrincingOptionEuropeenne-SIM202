@@ -95,10 +95,10 @@ public:
     matrice& operator=(const matrice& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
-    matrice& operator*(double a);
-    matrice& operator/(double a);
-    matrice& operator+(const matrice& A);
-    matrice& operator-(const matrice& A);
+    matrice& operator*=(double a);
+    matrice& operator/=(double a);
+    matrice& operator+=(const matrice& A);
+    matrice& operator-=(const matrice& A);
 };
 
 matrice operator*(const matrice& A, double a);
@@ -146,10 +146,10 @@ public:
     matrice_sym& operator=(const matrice_sym& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
-    matrice_sym& operator*(double a);
-    matrice_sym& operator/(double a);
-    matrice_sym& operator+(const matrice_sym& A); //On suppose que les matrices ont le même profil
-    matrice_sym& operator-(const matrice_sym& A); //On suppose que les matrices ont le même profil
+    matrice_sym& operator*=(double a);
+    matrice_sym& operator/=(double a);
+    matrice_sym& operator+=(const matrice_sym& A); //On suppose que les matrices ont le même profil
+    matrice_sym& operator-=(const matrice_sym& A); //On suppose que les matrices ont le même profil
 };
 
 ostream & operator<<(ostream & os, const matrice_sym& A);
@@ -182,10 +182,10 @@ public:
     matrice_nonsym& operator=(const matrice_nonsym& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
-    matrice_nonsym& operator*(double a);
-    matrice_nonsym& operator/(double a);
-    matrice_nonsym& operator+(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
-    matrice_nonsym& operator-(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
+    matrice_nonsym& operator*=(double a);
+    matrice_nonsym& operator/=(double a);
+    matrice_nonsym& operator+=(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
+    matrice_nonsym& operator-=(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
 };
 
 ostream & operator<<(ostream & os, const matrice_nonsym& A);
