@@ -1393,39 +1393,37 @@ matrice_nonsym LUdecomposition(const matrice_nonsym& A)
     matrice_nonsym lu(n,A.Profil); //Utilise la conservation du profil p
     for (int i=1; i<=n; i++)
     {
-        i -= 1;
-        lu.Lower[lu.Posdiag[i]] = 1;//mets diagonale lower à 0 car accesseur classique rempli Upper et non lower
+        lu.Lower[lu.Posdiag[i-1]] = 1;//mets diagonale lower à 0 car accesseur classique rempli Upper et non lower
     }
     for (int p=1; p<=n; p++)
     {
-        p -=1;
-        for (int j=p; j<n; j++) //boucle sur la matrice triangulaire supérieure
+        for (int j=p-1; j<n; j++) //boucle sur la matrice triangulaire supérieure
         {
-            if (p>=lu.Profil[j]) //ne modifie que les termes dans le profil
+            if (p-1>=lu.Profil[j]) //ne modifie que les termes dans le profil
             {
-                lu(p,j) = A(p,j);
-                for (int k=lu.Profil[p]; k<=p-1; k++)
+                lu(p-1,j) = A(p-1,j);
+                for (int k=lu.Profil[p-1]; k<=(p-1)-1; k++)
                 {
-                    lu(p,j) -= lu(p,k)*lu(k,j);
+                    lu(p-1,j) -= lu(p-1,k)*lu(k,j);
                 }
             }
         }
-        if (lu(p,p)==0)
+        if (lu(p-1,p-1)==0)
         {
             cout<<lu<<endl;
             cout<<"Erreur : Matrice non-factorisable"<<endl;
             exit(-1);
         }
-        for (int i=p+1; i<n; i++) //boucle sur la matrice triangulaire inférieure
+        for (int i=(p-1)+1; i<n; i++) //boucle sur la matrice triangulaire inférieure
         {
-            if (p>=lu.Profil[i])
+            if (p-1>=lu.Profil[i])
             {
-                lu(i,p) = A(i,p);
-                for (int k=lu.Profil[i]; k<=p-1; k++)
+                lu(i,p-1) = A(i,p-1);
+                for (int k=lu.Profil[i]; k<=(p-1)-1; k++)
                 {
-                    lu(i,p) -= lu(i,k)*lu(k,p);
+                    lu(i,p-1) -= lu(i,k)*lu(k,p-1);
                 }
-                lu(i,p) /= lu(p,p);
+                lu(i,p-1) /= lu(p-1,p-1);
             }
         }
     }
