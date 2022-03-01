@@ -245,12 +245,11 @@ vecteur operator/(const vecteur & u, const operande & ov)
   for (int i=0;i<d;i++) uv[i]=u[i]/v[i];
   return uv;
 }
+
 /*
 #############################################################
-
-######################Classe Maillage #######################
-
- #####Classe Point########
+###################### Classe Point #########################
+#############################################################
 */
 
  Point& Point::tf_affine(const vector<double> & A, const vector<double> &t)
@@ -316,8 +315,11 @@ ostream & operator<<(ostream & out, const Point & P)
     out<<"("<<P.x<<" , "<<P.y<<")";
     return out;
 }
+
 /*
-#### Classe Numeros ####
+#############################################################
+##################### Classe Numéros ########################
+#############################################################
 */
 
 ostream& operator<<(ostream& out, const Numeros & N)
@@ -327,7 +329,9 @@ ostream& operator<<(ostream& out, const Numeros & N)
   return out;
 }
 /*
-#####Classe Maillage ######
+#############################################################
+##################### Classe Maillage #######################
+#############################################################
 */
 
 void Maillage::maille_carre_unite(int m,int n)
@@ -546,7 +550,7 @@ double& matrice::operator()(int i, int j)
     return cols_[j][i]; //surcharge du vecteur
 }
 
-matrice& matrice::operator*(double a)
+matrice& matrice::operator*=(double a)
 {
     for (int i=0; i<m; i++)
     {
@@ -558,7 +562,7 @@ matrice& matrice::operator*(double a)
     return (*this);
 }
 
-matrice& matrice::operator/(double a)
+matrice& matrice::operator/=(double a)
 {
     if (a==0)
     {
@@ -575,7 +579,7 @@ matrice& matrice::operator/(double a)
     return (*this);
 }
 
-matrice& matrice::operator+(const matrice& A)
+matrice& matrice::operator+=(const matrice& A)
 {
     if (A.m!=m || A.n!=n)
     {
@@ -592,7 +596,7 @@ matrice& matrice::operator+(const matrice& A)
     return (*this);
 }
 
-matrice& matrice::operator-(const matrice& A)
+matrice& matrice::operator-=(const matrice& A)
 {
     if (A.m!=m || A.n!=n)
     {
@@ -907,13 +911,13 @@ double& matrice_sym::operator()(int i, int j) //Lecture et écriture
     }
 }
 
-matrice_sym& matrice_sym::operator*(double a)
+matrice_sym& matrice_sym::operator*=(double a)
 {
     Lower*=a;
     return *this;
 }
 
-matrice_sym& matrice_sym::operator/(double a)
+matrice_sym& matrice_sym::operator/=(double a)
 {
     if (a==0.)
     {
@@ -925,7 +929,7 @@ matrice_sym& matrice_sym::operator/(double a)
 }
 
 
-matrice_sym& matrice_sym::operator+(const matrice_sym& A)
+matrice_sym& matrice_sym::operator+=(const matrice_sym& A)
 {
     if (n!=A.n)
     {
@@ -966,7 +970,7 @@ matrice_sym& matrice_sym::operator+(const matrice_sym& A)
     return *this;
 }
 
-matrice_sym& matrice_sym::operator-(const matrice_sym& A)
+matrice_sym& matrice_sym::operator-=(const matrice_sym& A)
 {
     if (n!=A.n)
     {
@@ -1276,7 +1280,7 @@ double& matrice_nonsym::operator()(int i, int j) //Lecture et écriture
     }
 }
 
-matrice_nonsym& matrice_nonsym::operator*(double a)
+matrice_nonsym& matrice_nonsym::operator*=(double a)
 {
     Lower*=a;
     Upper*=a;
@@ -1284,7 +1288,7 @@ matrice_nonsym& matrice_nonsym::operator*(double a)
 }
 
 
-matrice_nonsym& matrice_nonsym::operator/(double a)
+matrice_nonsym& matrice_nonsym::operator/=(double a)
 {
     if (a==0.)
     {
@@ -1296,7 +1300,7 @@ matrice_nonsym& matrice_nonsym::operator/(double a)
     return *this;
 }
 
-matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
+matrice_nonsym& matrice_nonsym::operator+=(const matrice_nonsym& A)
 {
     if (n!=A.n)
     {
@@ -1340,7 +1344,7 @@ matrice_nonsym& matrice_nonsym::operator+(const matrice_nonsym& A)
     return *this;
 }
 
-matrice_nonsym& matrice_nonsym::operator-(const matrice_nonsym& A)
+matrice_nonsym& matrice_nonsym::operator-=(const matrice_nonsym& A)
 {
     if (n!=A.n)
     {
