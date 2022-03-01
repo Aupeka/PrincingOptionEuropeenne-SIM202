@@ -75,8 +75,8 @@ class Maillage
     void affiche() const;
     Maillage& affine(const vector<double> &,const vector<double> &);
     Maillage & operator +=(const Maillage &);
-    void savecoord(const char *fn) const; //Coordonées de tous les points du maillage et numéro associé de ces sommets
-    void savenumtri(const char *fn) const; // Numéros des sommets constituants chaque triangle et numérotation des triangles
+    void savecoord(const char *fn) const; //CoordonÃ©es de tous les points du maillage et numÃ©ro associÃ© de ces sommets
+    void savenumtri(const char *fn) const; // NumÃ©ros des sommets constituants chaque triangle et numÃ©rotation des triangles
 
 };
 Maillage operator +(const Maillage &, const Maillage &);
@@ -88,10 +88,10 @@ Maillage operator +(const Maillage &, const Maillage &);
 */
 
 // utilitaires
-void stop(const char * msg);                     // message d'arrêt
+void stop(const char * msg);                     // message d'arrÃªt
 void test_dim(int d1, int d2, const char * org); // test dimension
 
-// classe vecteur de réels double précision
+// classe vecteur de rÃ©els double prÃ©cision
 class vecteur
 {
 public :
@@ -105,21 +105,21 @@ public :
   // tools
   void init(int d);        // allocation
   void clear();
-  void resize(int ni);          // désallocation
-  int dim() const {return dim_;}                // accès dimension
+  void resize(int ni);          // dÃ©sallocation
+  int dim() const {return dim_;}                // accÃ¨s dimension
 
-  // opérateur d'assignation
+  // opÃ©rateur d'assignation
   vecteur & operator=(const vecteur & v);  // affectation d'un vecteur
   vecteur & operator=(double x);           // affectation d'une valeur
 
-  // opérateurs d'accès (pour les utilisateurs)
+  // opÃ©rateurs d'accÃ¨s (pour les utilisateurs)
   double  operator [](int i) const {return val_[i];}   // valeur    0->dim-1
-  double& operator [](int i) {return val_[i];}         // référence 0->dim-1
+  double& operator [](int i) {return val_[i];}         // rÃ©fÃ©rence 0->dim-1
   double  operator ()(int i) const {return val_[i-1];} // valeur    1->dim
-  double& operator ()(int i) {return val_[i-1];}       // référence 1->dim
-  vecteur operator ()(int i, int j) const;             // valeurs i à j (0<i<=j<=dim)
+  double& operator ()(int i) {return val_[i-1];}       // rÃ©fÃ©rence 1->dim
+  vecteur operator ()(int i, int j) const;             // valeurs i Ã  j (0<i<=j<=dim)
 
-  // opérateurs algébriques
+  // opÃ©rateurs algÃ©briques
   vecteur& operator +=(const vecteur & v);             // u += v
   vecteur& operator -=(const vecteur & v);             // u -= v
   vecteur& operator +=(double x);                      // u += x
@@ -127,9 +127,9 @@ public :
   vecteur& operator *=(double x);                      // u *= x
   vecteur& operator /=(double x);                      // u /= x
 
-}; // fin de définition de la classe
+}; // fin de dÃ©finition de la classe
 
-// opérateurs externes
+// opÃ©rateurs externes
 vecteur operator +(const vecteur & u); //+ unaire ne fait rien !
 vecteur operator -(const vecteur & u); //- unaire : chgt de signe
 vecteur operator +(const vecteur & u,const vecteur & v); // u + v
@@ -146,15 +146,15 @@ vecteur operator *(double x,const vecteur & u);          // x * u
 double operator |(const vecteur & u,const vecteur & v);  // u | v
 vecteur operator,(const vecteur & u,const vecteur & v);  // [u1,...,um,v1,...,vn]
 
-// opérateurs de comparaison
+// opÃ©rateurs de comparaison
 bool operator == (const vecteur & u,const vecteur & v);  // u == v
 bool operator != (const vecteur & u,const vecteur & v);  // u != v
 
-// opérateurs de lecture et d'écriture
+// opÃ©rateurs de lecture et d'Ã©criture
 istream & operator>>(istream & is, vecteur & u);         // is >> u
 ostream & operator<<(ostream & os, const vecteur & u);   // os << u
 
-//opérations composante à composante  u*~v et u/~v
+//opÃ©rations composante Ã  composante  u*~v et u/~v
 class operande
 {
  public:
@@ -207,21 +207,21 @@ ostream & operator<<(ostream & os, const matrice& A);
 ######################################################################################
 */
 
-class matrice_profil //pour matrices à profil symétrique
+class matrice_profil //pour matrices Ã  profil symÃ©trique
 {
 public:
-    int n; //on ne considère que des matrices carrées car à profil symétriques
+    int n; //on ne considÃ¨re que des matrices carrÃ©es car Ã  profil symÃ©triques
     vecteur Profil;
     vecteur Posdiag;
     //vecteur Lower;
     //vecteur Upper;
-    matrice_profil(int ni, const vecteur Pi); //constructeur de la matrice à partir du profil
+    matrice_profil(int ni, const vecteur Pi); //constructeur de la matrice Ã  partir du profil
     matrice_profil(const matrice_profil& A); //constructeur par copie
     //~matrice_profil();
 };
 
 /*
-#############################"Matrice symétrique"#####################################
+#############################"Matrice symÃ©trique"#####################################
 ######################################################################################
 */
 
@@ -238,8 +238,8 @@ public:
     double& operator()(int i, int j);
     matrice_sym& operator*(double a);
     matrice_sym& operator/(double a);
-    matrice_sym& operator+(const matrice_sym& A); //On suppose que les matrices ont le même profil
-    matrice_sym& operator-(const matrice_sym& A); //On suppose que les matrices ont le même profil
+    matrice_sym& operator+(const matrice_sym& A); //On suppose que les matrices ont le mÃªme profil
+    matrice_sym& operator-(const matrice_sym& A); //On suppose que les matrices ont le mÃªme profil
 };
 
 ostream & operator<<(ostream & os, const matrice_sym& A);
@@ -249,13 +249,13 @@ matrice_sym operator*(const matrice_sym& A, double a);
 matrice_sym operator/(const matrice_sym& A, double a);
 matrice_sym operator*(double a, const matrice_sym& A);
 vecteur operator*(const matrice_sym& A, const vecteur& V);
-matrice_sym operator+(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
-matrice_sym operator-(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
+matrice_sym operator+(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le mÃªme profil
+matrice_sym operator-(const matrice_sym& A, const matrice_sym& B); //On suppose que les matrices ont le mÃªme profil
 
 matrice_sym transpose(const matrice_sym& A);
 
 /*
-###################"Matrice non symétrique"#######################################
+###################"Matrice non symÃ©trique"#######################################
 ##################################################################################
 */
 
@@ -267,15 +267,15 @@ public:
 
     matrice_nonsym(int ni, const vecteur Pi); //constructeur de la matrice vide
     matrice_nonsym(const matrice_nonsym& A); //constructeur par copie
-    matrice_nonsym(const matrice_sym& A);//constructeur par copie à partir d'une matrice symétrique
+    matrice_nonsym(const matrice_sym& A);//constructeur par copie Ã  partir d'une matrice symÃ©trique
     //~matrice_nonsym();
     matrice_nonsym& operator=(const matrice_nonsym& A);
     double operator()(int i, int j) const;
     double& operator()(int i, int j);
     matrice_nonsym& operator*(double a);
     matrice_nonsym& operator/(double a);
-    matrice_nonsym& operator+(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
-    matrice_nonsym& operator-(const matrice_nonsym& A); //On suppose que les matrices ont le même profil
+    matrice_nonsym& operator+(const matrice_nonsym& A); //On suppose que les matrices ont le mÃªme profil
+    matrice_nonsym& operator-(const matrice_nonsym& A); //On suppose que les matrices ont le mÃªme profil
 };
 
 ostream & operator<<(ostream & os, const matrice_nonsym& A);
@@ -285,31 +285,28 @@ matrice_nonsym operator*(const matrice_nonsym& A, double a);
 matrice_nonsym operator/(const matrice_nonsym& A, double a);
 vecteur operator*(const matrice_nonsym& A, const vecteur& V);
 matrice_nonsym operator*(double a, const matrice_nonsym& A);
-matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
-matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le mÃªme profil
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B); //On suppose que les matrices ont le mÃªme profil
 
 matrice_nonsym transpose(const matrice_nonsym& A);
 
 /*
-###########################"Opérations mixtes"######################################
+###########################"OpÃ©rations mixtes"######################################
 ####################################################################################
 */
 
-//Opérations entre une amtrice symétrique et une non-symétrique
-//Retourne nécessairement une matrice non symétrique
-matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
-matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le même profil
-matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
-matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le même profil
+//OpÃ©rations entre une amtrice symÃ©trique et une non-symÃ©trique
+//Retourne nÃ©cessairement une matrice non symÃ©trique
+matrice_nonsym operator+(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le mÃªme profil
+matrice_nonsym operator-(const matrice_nonsym& A, const matrice_sym& B); //On suppose que les matrices ont le mÃªme profil
+matrice_nonsym operator+(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le mÃªme profil
+matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On suppose que les matrices ont le mÃªme profil
 matrice_nonsym LUdecomposition(const matrice_nonsym& A);
 matrice_nonsym LUdecomposition(const matrice_sym& A);
 vecteur resolsys(const matrice_nonsym A, const vecteur b);
-vecteur Q(double K,vector<Point> V);
-double pos(double x);
 
 
-
-/*#######################"Matrices éléments finis"####################################
+/*#######################"Matrices Ã©lÃ©ments finis"####################################
 ##############################################################################"#####
 */
 
@@ -318,5 +315,15 @@ matrice matK_elem(const Point& P1,const Point& P2,const Point& P3);
 matrice A(const Point& P);
 vecteur V(const Point& P);
 matrice matB_elem(const Point& P1,const Point& P2,const Point& P3);
+
+/*
+############################"RÃ©solution"###############################
+*/
+
+vecteur Q(double K,vector<Point> V);
+double pos(double x);
+vecteur resolution_1(double deltaT, double K,vector<Point> V);
+vecteur resolution_2(double deltaT, double K,vector<Point> V);
+
 
 #endif
