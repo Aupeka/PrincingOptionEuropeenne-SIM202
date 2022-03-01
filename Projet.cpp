@@ -1733,32 +1733,41 @@ vecteur Q(double K,vector<Point> V)
     return(Q);
 }
 
+
 vecteur resolution_1(double deltaT, double K,vector<Point> V)
 {
+  ofstream out("data_1");
   matrice_nonsym D = matD();
   matrice_sym M = matM();
   matrice_nonsym E = M + deltaT*D;
   vecteur P = Q(K,V);
+  out<<P<<endl;
   for (int k=0;k<K;++k)
   {
     vecteur temp(P);
     P = resolvesys(E,M*temp);
+    out<<P<<endl;
   }
+  out.close();
   return P;
 }
 
 vecteur resolution_2(double deltaT, double K,vector<Point> V)
 {
+  ofstream out("data_2");
   matrice_nonsym D = matD();
   matrice_sym M = matM();
   matrice_nonsym E = M + deltaT/2*D;
   matrice_nonsym F = M - delta/2*D;
   vecteur P = Q(K,V);
+  out<<P<<endl;
   for (int k=0;k<K;++k)
   {
     vecteur temp(P);
     P = resolvesys(E,F*temp);
+    out<<P<<endl;
   }
+  out.close();
   return P;
 }
   
