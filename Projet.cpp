@@ -1738,11 +1738,11 @@ vecteur Q(double K,vector<Point> V)
 }
 
 
-vecteur resolution_1(double deltaT, double K,vector<Point> V)
+vecteur resolution_1(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & sumelts)
 {
   ofstream out("data_1");
-  matrice_nonsym D = matD();
-  matrice_sym M = matM();
+  matrice_nonsym D = matD(sommets, numelts, 0.05);
+  matrice_sym M = matM(sommets, numelts);
   matrice_nonsym E = M + deltaT*D;
   vecteur P = Q(K,V);
   out<<P<<endl;
@@ -1756,11 +1756,11 @@ vecteur resolution_1(double deltaT, double K,vector<Point> V)
   return P;
 }
 
-vecteur resolution_2(double deltaT, double K,vector<Point> V)
+vecteur resolution_2(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & sumelts)
 {
   ofstream out("data_2");
-  matrice_nonsym D = matD();
-  matrice_sym M = matM();
+  matrice_nonsym D = matD(sommets, numelts, 0.05);
+  matrice_sym M = matM(sommets, numelts);
   matrice_nonsym E = M + deltaT/2*D;
   matrice_nonsym F = M - delta/2*D;
   vecteur P = Q(K,V);
