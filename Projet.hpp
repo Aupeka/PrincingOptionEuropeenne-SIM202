@@ -203,8 +203,9 @@ matrice operator*(const matrice& A, const matrice& B);
 matrice transpose(const matrice& A);
 ostream & operator<<(ostream & os, const matrice& A);
 /*
-####################################"Matrice profil"##################################
-######################################################################################
+#############################################################
+###################### Matrice Profil #######################
+#############################################################
 */
 
 class matrice_profil //pour matrices à profil symétrique
@@ -221,8 +222,9 @@ public:
 };
 
 /*
-#############################"Matrice symétrique"#####################################
-######################################################################################
+#############################################################
+################### Matrice Symétrique ######################
+#############################################################
 */
 
 class matrice_sym : public matrice_profil
@@ -255,8 +257,9 @@ matrice_sym operator-(const matrice_sym& A, const matrice_sym& B); //On suppose 
 matrice_sym transpose(const matrice_sym& A);
 
 /*
-###################"Matrice non symétrique"#######################################
-##################################################################################
+#############################################################
+################ Matrice non-symétrique #####################
+#############################################################
 */
 
 class matrice_nonsym : public matrice_profil
@@ -291,8 +294,9 @@ matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B); //On
 matrice_nonsym transpose(const matrice_nonsym& A);
 
 /*
-###########################"Opérations mixtes"######################################
-####################################################################################
+#############################################################
+##################### Opérations Mixtes #####################
+#############################################################
 */
 
 //Opérations entre une amtrice symétrique et une non-symétrique
@@ -306,8 +310,10 @@ matrice_nonsym LUdecomposition(const matrice_sym& A);
 vecteur resolsys(const matrice_nonsym A, const vecteur b);
 
 
-/*#######################"Matrices éléments finis"####################################
-##############################################################################"#####
+/*
+#############################################################
+################## Matrices Elementaires ####################
+#############################################################
 */
 
 matrice matM_elem(const Point& P1,const Point& P2,const Point& P3);
@@ -317,7 +323,9 @@ vecteur V(const Point& P);
 matrice matB_elem(const Point& P1,const Point& P2,const Point& P3);
 
 /*
-############################"Résolution"###############################
+#############################################################
+####################### Resolution #########################
+#############################################################
 */
 
 vecteur Q(double K,vector<Point> V);
