@@ -1485,6 +1485,8 @@ matrice_sym matK_elem(const Point& P1,const Point& P2,const Point& P3)
     Point R(x1+(x2-x1)/6+(x3-x1)*2/3,y1+(y2-y1)/6+(y3-y1)*2/3);
 
     Kel=(A(P)/6 + A(Q)/6 + A(R)/6)*norm*transpose(norm)/(3*abs(D));
+  
+    return Kel;
 }
 
 
@@ -1576,6 +1578,8 @@ matrice_nonsym matB_elem(const Point& P1,const Point& P2,const Point& P3)
     }
 
     Bel *= k*omega_0*Bel;
+  
+    return Bel;
 }
 
 
