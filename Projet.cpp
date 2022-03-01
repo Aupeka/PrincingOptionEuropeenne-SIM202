@@ -1542,6 +1542,28 @@ vecteur resolsys(const matrice_nonsym A, const vecteur b) //Ax=b
     return(x);
 }
 
+double pos(double x)
+{
+    if (x>0)
+    {
+        return(x);
+    }
+    return(0);
+}
+
+vecteur Q(double K,vector<Point> V)
+{
+    vecteur Q(V.size());
+    vector<Point>::const_iterator it;
+    it=V.begin();
+    for (int i=0;i<V.size();++i,++it)
+    {
+        Point P=*it;
+        Q[i]=pos(P.x+P.y-K);
+    }
+    return(Q);
+}
+
 
 /*#####################################Matrice éléments finis##########################
 */

@@ -304,6 +304,8 @@ matrice_nonsym operator-(const matrice_sym& A, const matrice_nonsym& B); //On su
 matrice_nonsym LUdecomposition(const matrice_nonsym& A);
 matrice_nonsym LUdecomposition(const matrice_sym& A);
 vecteur resolsys(const matrice_nonsym A, const vecteur b);
+vecteur Q(double K,vector<Point> V);
+double pos(double x);
 
 
 
