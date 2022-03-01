@@ -166,7 +166,15 @@ operande operator~(const vecteur & u);                     // &u (unaire) -> opu
 vecteur operator*(const vecteur & u, const operande & ov); // u * opv
 vecteur operator/(const vecteur & u, const operande & ov); // u / opv
 
+/*
+#############################################################
+###################### Classe En plus #######################
+#############################################################
+*/
 
+Numeros get(list<Numeros>, int);
+
+int minimum(int, int);
 
 
 /*
