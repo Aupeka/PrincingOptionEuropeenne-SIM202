@@ -1574,7 +1574,7 @@ matrice matM_elem(const Point& P1,const Point& P2,const Point& P3)
     matrice Mel(3,3);
     for (int i=0;i<3;++i)
     {
-        for (int j=0;i<3;++j)
+        for (int j=0;j<3;++j)
         {
             if (i==j)
             {
