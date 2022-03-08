@@ -1657,19 +1657,20 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
     norm(2,0)=y1-y2;
     norm(2,1)=x2-x1;
 
+
     //omega(j,q)
     matrice omega_chap(3,3);
-    omega_chap(1,1) = 1 - x1 - y1;
-    omega_chap(2,1) = x1;
-    omega_chap(3,1) = y1;
+    omega_chap(0,0) = 1 - x1 - y1;
+    omega_chap(1,0) = x1;
+    omega_chap(2,0) = y1;
 
-    omega_chap(1,2) = 1 - x2 - y2;
-    omega_chap(2,2) = x2;
-    omega_chap(3,2) = y2;
+    omega_chap(0,1) = 1 - x2 - y2;
+    omega_chap(1,1) = x2;
+    omega_chap(2,1) = y2;
 
-    omega_chap(1,3) = 1 - x3 - y3;
-    omega_chap(2,3) = x3;
-    omega_chap(3,3) = y3;
+    omega_chap(0,2) = 1 - x3 - y3;
+    omega_chap(1,2) = x3;
+    omega_chap(2,2) = y3;
 
     //S^q
     matrice S(3,2);
@@ -1692,14 +1693,15 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
     //Calculs Moches
     for (int i = 0; i<3; ++i)
     {
+
         for (int j = 0; j<3; ++j)
         {
             //S^q * norm (puis on ne garde que la valeur qui nous intéresse)
-            matrice temp = transpose(S)*norm;
+            matrice temp = norm*transpose(S);
 
             for (int q = 0; q<3; ++q)
             {
-                Bel(i,j) += temp(q,j)*omega_chap(j,q);
+                Bel(i,j) += temp(i,q)*omega_chap(q,j);
             }
         }
     }
@@ -1707,7 +1709,6 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
     Bel = k*omega_0*Bel;
     return(Bel);
 }
-
 /*
 #############################################################
 ######################## Assemblage #########################
