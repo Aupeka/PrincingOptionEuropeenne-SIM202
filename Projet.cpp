@@ -1612,7 +1612,7 @@ matrice matK_elem(const Point& P1,const Point& P2,const Point& P3)
     Point Q(x1+(x2-x1)*2/3+(x3-x1)/6,y1+(y2-y1)*2/3+(y3-y1)/6);
     Point R(x1+(x2-x1)/6+(x3-x1)*2/3,y1+(y2-y1)/6+(y3-y1)*2/3);
 
-    Kel=(A(P)/6 + A(Q)/6 + A(R)/6)*norm*transpose(norm)/(3*abs(D));
+    Kel=norm*(A(P)/6 + A(Q)/6 + A(R)/6)*transpose(norm)/(3*abs(D));
     return(Kel);
 }
 
