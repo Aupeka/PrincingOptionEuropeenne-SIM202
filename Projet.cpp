@@ -615,27 +615,27 @@ matrice& matrice::operator-=(const matrice& A)
 
 matrice operator*(const matrice& A, double a)
 {
-    return matrice(A)*a;
+    return matrice(A)*=a;
 }
 
 matrice operator/(const matrice& A, double a)
 {
-    return matrice(A)/a;
+    return matrice(A)/=a;
 }
 
 matrice operator*(double a, const matrice& A)
 {
-    return matrice(A)*a;
+    return matrice(A)*=a;
 }
 
 matrice operator+(const matrice& A, const matrice& B)
 {
-    return matrice(A)+B;
+    return matrice(A)+=B;
 }
 
 matrice operator-(const matrice& A, const matrice& B)
 {
-    return matrice(A)-B;
+    return matrice(A)-=B;
 }
 
 matrice operator*(const matrice& A, const matrice& B)
@@ -685,10 +685,10 @@ vecteur operator*(const matrice& A, const vecteur& u)
 
 matrice transpose(const matrice& A)
 {
-    matrice Res(A.m,A.n);
-    for (int i=0; i<A.m; ++i)
+    matrice Res(A.n,A.m);
+    for (int i=0; i<A.n; ++i)
     {
-        for (int j=0; j<A.n; ++j)
+        for (int j=0; j<A.m; ++j)
         {
             Res(i,j) = A(j,i);
         }
@@ -1018,12 +1018,12 @@ void print(const matrice_sym& A)
 
 matrice_sym operator*(const matrice_sym& A, double a)
 {
-    return matrice_sym(A)*a;
+    return matrice_sym(A)*=a;
 }
 
 matrice_sym operator*(double a, const matrice_sym& A)
 {
-    return matrice_sym(A)*a;
+    return matrice_sym(A)*=a;
 }
 
 vecteur operator*(const matrice_sym& A, const vecteur& V)
@@ -1046,17 +1046,17 @@ vecteur operator*(const matrice_sym& A, const vecteur& V)
 
 matrice_sym operator/(const matrice_sym& A, double a)
 {
-    return matrice_sym(A)/a;
+    return matrice_sym(A)/=a;
 }
 
 matrice_sym operator+(const matrice_sym& A, const matrice_sym& B)
 {
-    return matrice_sym(A)+B;
+    return matrice_sym(A)+=B;
 }
 
 matrice_sym operator-(const matrice_sym& A, const matrice_sym& B)
 {
-    return matrice_sym(A)-B;
+    return matrice_sym(A)-=B;
 }
 
 matrice_sym transpose(const matrice_sym& A)
@@ -1395,12 +1395,12 @@ void print(const matrice_nonsym& A)
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a)
 {
-    return matrice_nonsym(A)*a;
+    return matrice_nonsym(A)*a=;
 }
 
 matrice_nonsym operator*(double a, const matrice_nonsym& A)
 {
-    return matrice_nonsym(A)*a;
+    return matrice_nonsym(A)*=a;
 }
 
 vecteur operator*(const matrice_nonsym& A, const vecteur& V)
@@ -1423,17 +1423,17 @@ vecteur operator*(const matrice_nonsym& A, const vecteur& V)
 
 matrice_nonsym operator/(const matrice_nonsym& A, double a)
 {
-    return matrice_nonsym(A)/a;
+    return matrice_nonsym(A)/=a;
 }
 
 matrice_nonsym operator+(const matrice_nonsym& A, const matrice_nonsym& B)
 {
-    return matrice_nonsym(A)+B;
+    return matrice_nonsym(A)+=B;
 }
 
 matrice_nonsym operator-(const matrice_nonsym& A, const matrice_nonsym& B)
 {
-    return matrice_nonsym(A)-B;
+    return matrice_nonsym(A)-=B;
 }
 
 matrice_nonsym transpose(const matrice_nonsym& A)
@@ -1710,7 +1710,7 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
 
 /*
 #############################################################
-################## Assemblage ####################
+######################## Assemblage #########################
 #############################################################
 */
 
