@@ -672,11 +672,11 @@ vecteur operator*(const matrice& A, const vecteur& u)
         exit(-1);
     }
     vecteur Res(A.m,0.);
-    for (int i=1; i<A.m; ++i)
+    for (int i=0; i<A.m; ++i)
     {
-        for (int j=1; j<A.n;++j)
+        for (int j=0; j<A.n;++j)
         {
-           Res[i] = A(i,j)*u[j];
+           Res[i] += A(i,j)*u[j];
         }
     }
     return Res;
