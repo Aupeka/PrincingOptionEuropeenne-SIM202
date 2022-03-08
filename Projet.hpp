@@ -172,7 +172,7 @@ vecteur operator/(const vecteur & u, const operande & ov); // u / opv
 #############################################################
 */
 
-Numeros get(list<Numeros>, int);
+//Numeros get(list<Numeros>, int);
 
 int minimum(int, int);
 
