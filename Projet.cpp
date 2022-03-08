@@ -1715,6 +1715,7 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
 #############################################################
 */
 
+/*
 Numeros get(list<Numeros> _list, int _i){
     list<Numeros>::iterator it = _list.begin();
     for(int i=0; i<_i; i++){
@@ -1722,6 +1723,7 @@ Numeros get(list<Numeros> _list, int _i){
     }
     return *it;
 }
+*/
 
 int minimum(int a, int b){
     if (a <= b){return a;}
@@ -1750,9 +1752,22 @@ for (int I = 0; I < Nbtri; ++I){
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        int I = get(Numtri,l)(i);
+        
+        list<Numeros>::const_iterator it_i = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it_i;
+        }
+        int I = (*it_i)(i);
+
+
         for (int j = 0; j<3; ++j){
-            int J = get(Numtri,l)(j);
+
+            list<Numeros>::const_iterator it_j = Numtri.begin();
+            for(int m=0; m<l; m++){
+                ++it_j;
+            }
+            int J =(*it_j)(j);
+
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
@@ -1808,9 +1823,22 @@ for (int I = 0; I < Nbtri; ++I){
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        int I = get(Numtri,l)(i);
+        
+        list<Numeros>::const_iterator it_i = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it_i;
+        }
+        int I = (*it_i)(i);
+
+
         for (int j = 0; j<3; ++j){
-            int J = get(Numtri,l)(j);
+
+            list<Numeros>::const_iterator it_j = Numtri.begin();
+            for(int m=0; m<l; m++){
+                ++it_j;
+            }
+            int J =(*it_j)(j);
+
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
@@ -1864,9 +1892,22 @@ for (int I = 0; I < Nbtri; ++I){
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        int I = get(Numtri,l)(i);
+        
+        list<Numeros>::const_iterator it_i = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it_i;
+        }
+        int I = (*it_i)(i);
+
+
         for (int j = 0; j<3; ++j){
-            int J = get(Numtri,l)(j);
+
+            list<Numeros>::const_iterator it_j = Numtri.begin();
+            for(int m=0; m<l; m++){
+                ++it_j;
+            }
+            int J =(*it_j)(j);
+
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
