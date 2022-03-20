@@ -1982,12 +1982,6 @@ matrice_nonsym matD(const vector<Point>& Coorneu, const list<Numeros>& Numtri, d
 }
 
 
-matrice_nonsym matD(const vector<Point>& Coorneu, const list<Numeros>& Numtri, double r){
-    matrice_nonsym DD = matK(Coorneu, Numtri) + matB(Coorneu, Numtri) + matM(Coorneu, Numtri)*r;
-    return DD;
-}
-
-
 /*
 #############################################################
 ####################### Resolution ##########################
