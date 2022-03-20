@@ -1751,7 +1751,7 @@ for (int l = 0; l < Nbtri; ++l)
     }
 }
 */
-vector Numtri_l(3);
+vecteur Numtri_l(3);
 
 for (int l = 0; l < Nbtri; ++l)
 {
@@ -1762,7 +1762,7 @@ for (int l = 0; l < Nbtri; ++l)
 
     for (int i = 0; i<3; ++i){
         
-        int I = (*it)(i)
+        int I = (*it)(i);
         Numtri_l(i) = (*it)(i);
 
 
@@ -1837,7 +1837,7 @@ for (int l = 0; l < Nbtri; ++l)
 }
 */
 
-vector Numtri_l(3);
+vecteur Numtri_l(3);
 
 for (int l = 0; l < Nbtri; ++l)
 {
@@ -1876,7 +1876,7 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
 
     for (int i = 0; i < 3; ++i){
        
-       int I=Numtri_l(i);;
+       int I=Numtri_l(i);
        
        for (int j = 0; j < 3; ++j){
            
@@ -1922,7 +1922,7 @@ for (int l = 0; l < Nbtri; ++l)
 }
 */
 
-vector Numtri_l(3);
+vecteur Numtri_l(3);
 
 for (int l = 0; l < Nbtri; ++l)
 {
@@ -1933,7 +1933,7 @@ for (int l = 0; l < Nbtri; ++l)
 
     for (int i = 0; i<3; ++i){
         
-        int I = (*it)(i)
+        int I = (*it)(i);
         Numtri_l(i) = (*it)(i);
 
 
@@ -1960,7 +1960,7 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
 
     for (int i = 0; i < 3; ++i){
        
-       int I=Numtri_l(i);;
+       int I=Numtri_l(i);
        
        for (int j = 0; j < 3; ++j){
            
@@ -2017,7 +2017,7 @@ vecteur Q(double K,vector<Point> V)
 }
 
 
-vecteur resolution_1(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & sumelts)
+vecteur resolution_1(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & numelts)
 {
   ofstream out("data_1");
   matrice_nonsym D = matD(sommets, numelts, 0.05);
@@ -2028,26 +2028,26 @@ vecteur resolution_1(double deltaT, double K,const vector<Point> & V, const vect
   for (int k=0;k<K;++k)
   {
     vecteur temp(P);
-    P = resolvesys(E,M*temp);
+    P = resolsys(E,M*temp);
     out<<P<<endl;
   }
   out.close();
   return P;
 }
 
-vecteur resolution_2(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & sumelts)
+vecteur resolution_2(double deltaT, double K,const vector<Point> & V, const vector<Point> & sommets, const list<Numeros> & numelts)
 {
   ofstream out("data_2");
   matrice_nonsym D = matD(sommets, numelts, 0.05);
   matrice_sym M = matM(sommets, numelts);
   matrice_nonsym E = M + deltaT/2*D;
-  matrice_nonsym F = M - delta/2*D;
+  matrice_nonsym F = M - deltaT/2*D;
   vecteur P = Q(K,V);
   out<<P<<endl;
   for (int k=0;k<K;++k)
   {
     vecteur temp(P);
-    P = resolvesys(E,F*temp);
+    P = resolsys(E,F*temp);
     out<<P<<endl;
   }
   out.close();
