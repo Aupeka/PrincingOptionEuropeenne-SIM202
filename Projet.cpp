@@ -1715,16 +1715,6 @@ matrice matB_elem(const Point& P1,const Point& P2,const Point& P3)
 #############################################################
 */
 
-/*
-Numeros get(list<Numeros> _list, int _i){
-    list<Numeros>::iterator it = _list.begin();
-    for(int i=0; i<_i; i++){
-        ++it;
-    }
-    return *it;
-}
-*/
-
 int minimum(int a, int b){
     if (a <= b){return a;}
     else {return b;}
@@ -1749,48 +1739,62 @@ for (int I = 0; I < Nbtri; ++I){
 }
 
     //On identifie le profil via des minimums
+/*
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        
-        list<Numeros>::const_iterator it_i = Numtri.begin();
-        for(int n=0; n<l; n++){
-            ++it_i;
+        int I = get(Numtri,l)(i);
+        for (int j = 0; j<3; ++j){
+            int J = get(Numtri,l)(j);
+            if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
-        int I = (*it_i)(i);
+    }
+}
+*/
+vector Numtri_l(3);
+
+for (int l = 0; l < Nbtri; ++l)
+{
+    list<Numeros>::const_iterator it = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it;
+        }
+
+    for (int i = 0; i<3; ++i){
+        
+        int I = (*it)(i)
+        Numtri_l(i) = (*it)(i);
 
 
         for (int j = 0; j<3; ++j){
 
-            list<Numeros>::const_iterator it_j = Numtri.begin();
-            for(int m=0; m<l; m++){
-                ++it_j;
-            }
-            int J =(*it_j)(j);
+            int J =(*it)(j);
 
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
 }
 
+
+
 matrice_sym MM(Nbtri, Prof2);
 
 
 for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il ne faut pas aller !
 {
-    int indice_1 = get(Numtri,l)(1);
-    int indice_2 = get(Numtri,l)(2);
-    int indice_3 = get(Numtri,l)(3);
+    int indice_1 = Numtri_l(1);
+    int indice_2 = Numtri_l(2);
+    int indice_3 = Numtri_l(3);
 
-    matrice_sym Mel = matM_elem(indice_1, indice_2, indice_3);
+    matrice Mel = matM_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
        
-       int I=get(Numtri,l)(i);;
+       int I=Numtri_l(i);;
        
        for (int j = 0; j < 3; ++j){
            
-           int J=get(Numtri,l)(j);
+           int J=Numtri_l(j);
            
            MM(I,J)=MM(I,J) + Mel(i,j);
        }
@@ -1820,48 +1824,63 @@ for (int I = 0; I < Nbtri; ++I){
 }
 
     //On identifie le profil via des minimums
+/*
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        
-        list<Numeros>::const_iterator it_i = Numtri.begin();
-        for(int n=0; n<l; n++){
-            ++it_i;
+        int I = get(Numtri,l)(i);
+        for (int j = 0; j<3; ++j){
+ 9           int J = get(Numtri,l)(j);
+            if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
-        int I = (*it_i)(i);
+    }
+}
+*/
+
+vector Numtri_l(3);
+
+for (int l = 0; l < Nbtri; ++l)
+{
+    list<Numeros>::const_iterator it = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it;
+        }
+
+    for (int i = 0; i<3; ++i){
+        
+        int I = (*it)(i);
+        Numtri_l(i) = (*it)(i);
 
 
         for (int j = 0; j<3; ++j){
 
-            list<Numeros>::const_iterator it_j = Numtri.begin();
-            for(int m=0; m<l; m++){
-                ++it_j;
-            }
-            int J =(*it_j)(j);
+            int J =(*it)(j);
 
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
 }
 
+
+
 matrice_sym KK(Nbtri, Prof2);
 
 
 for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il ne faut pas aller !
 {
-    int indice_1 = get(Numtri,l)(1);
-    int indice_2 = get(Numtri,l)(2);
-    int indice_3 = get(Numtri,l)(3);
+    int indice_1 = Numtri_l(1);
+    int indice_2 = Numtri_l(2);
+    int indice_3 = Numtri_l(3);
 
-    matrice_sym Kel = matK_elem(indice_1, indice_2, indice_3);
+    matrice Kel = matK_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
        
-       int I=get(Numtri,l)(i);;
+       int I=Numtri_l(i);;
        
        for (int j = 0; j < 3; ++j){
            
-           int J=get(Numtri,l)(j);
+           int J=Numtri_l(j);
            
            KK(I,J)=KK(I,J) + Kel(i,j);
        }
@@ -1889,48 +1908,63 @@ for (int I = 0; I < Nbtri; ++I){
 }
 
     //On identifie le profil via des minimums
+
+/*
 for (int l = 0; l < Nbtri; ++l)
 {
     for (int i = 0; i<3; ++i){
-        
-        list<Numeros>::const_iterator it_i = Numtri.begin();
-        for(int n=0; n<l; n++){
-            ++it_i;
+        int I = get(Numtri,l)(i);
+        for (int j = 0; j<3; ++j){
+            int J = get(Numtri,l)(j);
+            if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
-        int I = (*it_i)(i);
+    }
+}
+*/
+
+vector Numtri_l(3);
+
+for (int l = 0; l < Nbtri; ++l)
+{
+    list<Numeros>::const_iterator it = Numtri.begin();
+        for(int n=0; n<l; n++){
+            ++it;
+        }
+
+    for (int i = 0; i<3; ++i){
+        
+        int I = (*it)(i)
+        Numtri_l(i) = (*it)(i);
 
 
         for (int j = 0; j<3; ++j){
 
-            list<Numeros>::const_iterator it_j = Numtri.begin();
-            for(int m=0; m<l; m++){
-                ++it_j;
-            }
-            int J =(*it_j)(j);
+            int J =(*it)(j);
 
             if (J<I) { Prof2(I) = minimum(Prof2(I), J);}
         }
     }
 }
 
+
 matrice_nonsym BB(Nbtri, Prof2);
 
 
 for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il ne faut pas aller !
 {
-    int indice_1 = get(Numtri,l)(1);
-    int indice_2 = get(Numtri,l)(2);
-    int indice_3 = get(Numtri,l)(3);
+    int indice_1 = Numtri_l(1);
+    int indice_2 = Numtri_l(2);
+    int indice_3 = Numtri_l(3);
 
-    matrice_nonsym Bel = matB_elem(indice_1, indice_2, indice_3);
+    matrice Bel = matB_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
        
-       int I=get(Numtri,l)(i);;
+       int I=Numtri_l(i);;
        
        for (int j = 0; j < 3; ++j){
            
-           int J=get(Numtri,l)(j);
+           int J=Numtri_l(j);
            
            BB(I,J)=BB(I,J) + Bel(i,j);
        }
@@ -1939,6 +1973,12 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
 
 return BB;
 
+}
+
+
+matrice_nonsym matD(const vector<Point>& Coorneu, const list<Numeros>& Numtri, double r){
+    matrice_nonsym DD = matK(Coorneu, Numtri) + matB(Coorneu, Numtri) + matM(Coorneu, Numtri)*r;
+    return DD;
 }
 
 
