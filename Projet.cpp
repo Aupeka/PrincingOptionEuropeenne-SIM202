@@ -1761,7 +1761,7 @@ for (int l = 0; l < Nbtri; ++l)
         }
 
     for (int i = 0; i<3; ++i){
-        
+
         int I = (*it)(i);
         Numtri_l(i) = (*it)(i);
 
@@ -1789,13 +1789,13 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
     matrice Mel = matM_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
-       
+
        int I=Numtri_l(i);;
-       
+
        for (int j = 0; j < 3; ++j){
-           
+
            int J=Numtri_l(j);
-           
+
            MM(I,J)=MM(I,J) + Mel(i,j);
        }
     }
@@ -1847,7 +1847,7 @@ for (int l = 0; l < Nbtri; ++l)
         }
 
     for (int i = 0; i<3; ++i){
-        
+
         int I = (*it)(i);
         Numtri_l(i) = (*it)(i);
 
@@ -1875,13 +1875,13 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
     matrice Kel = matK_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
-       
+
        int I=Numtri_l(i);
-       
+
        for (int j = 0; j < 3; ++j){
-           
+
            int J=Numtri_l(j);
-           
+
            KK(I,J)=KK(I,J) + Kel(i,j);
        }
     }
@@ -1932,7 +1932,7 @@ for (int l = 0; l < Nbtri; ++l)
         }
 
     for (int i = 0; i<3; ++i){
-        
+
         int I = (*it)(i);
         Numtri_l(i) = (*it)(i);
 
@@ -1959,13 +1959,13 @@ for (int l = 0; l < Nbtri; ++l) //"l" est un "L" + On va jamais aller là où il
     matrice Bel = matB_elem(indice_1, indice_2, indice_3);
 
     for (int i = 0; i < 3; ++i){
-       
+
        int I=Numtri_l(i);
-       
+
        for (int j = 0; j < 3; ++j){
-           
+
            int J=Numtri_l(j);
-           
+
            BB(I,J)=BB(I,J) + Bel(i,j);
        }
     }
@@ -2047,4 +2047,3 @@ vecteur resolution_2(double deltaT, double K,const vector<Point> & V, const vect
   out.close();
   return P;
 }
-  
