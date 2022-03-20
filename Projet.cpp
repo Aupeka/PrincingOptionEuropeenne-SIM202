@@ -1395,7 +1395,7 @@ void print(const matrice_nonsym& A)
 
 matrice_nonsym operator*(const matrice_nonsym& A, double a)
 {
-    return matrice_nonsym(A)*a=;
+    return matrice_nonsym(A)*=a;
 }
 
 matrice_nonsym operator*(double a, const matrice_nonsym& A)
