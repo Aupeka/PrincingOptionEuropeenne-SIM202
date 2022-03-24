@@ -1,6 +1,5 @@
-function vec = gradu(x,y)
+function vec = gradu(x,y,cas)
 % Calcul du gradient de u 
-cas=1;
 if cas == 1 
     vec = pi*[ cos(pi*x)*sin(pi*y) ; cos(pi*y)*sin(pi*x) ] ; 
 end ;
