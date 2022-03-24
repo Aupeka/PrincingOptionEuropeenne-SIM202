@@ -1,15 +1,24 @@
 
+
 %%
 % -------------------------------- %
 %        Lecture du maillage       %
 % -------------------------------- %
+
 clear all
-nom_maillage = 'Cas1.msh';
+global cas ;
+cas = 1 ;
+if cas == 1 
+    nom_maillage = 'Cas1.msh' ;
+end ;
+if cas == 2 
+    nom_maillage = 'Cas2.msh' ;
+end ;
+
 
 [Nbpt, Nbtri, Coorneu, Refneu, Numtri, ...
  Reftri, Nbaretes, Numaretes, Refaretes] = lecture_msh(nom_maillage);
 
-cas=1;
 %%
 % ---------------------------------------------------------- %
 %     Définition des données utiles pour notre problème      %
@@ -202,7 +211,7 @@ Surface = sparse(Nb_faces_int-1, Nbaretes) ;  % Matrice de rigidité surfacique
         Surface(i-1,j) = ((normef([S11;S12])*normef([S21;S22]))/normetri([P1,P2,P3]))*(nF1'*nF2);
       end ;  
     end ; 
-    % Calcul de g(xF2)
+    % Calcul de g(xF1)
     bb = [ bb ; frontiere(xF1(1), xF1(2)) ] ;
   end ;
     
@@ -220,6 +229,19 @@ end;
 if cas==2
     U_h= KK\(-G);
 end
+
+if cas == 1 
+    figure;
+    [X,Y] = meshgrid(0:0.02:1,0:0.02:1);
+    u = surf(X,Y,sin(pi*X).*sin(pi*Y)) ;
+end
+if cas == 2
+  figure;
+  [X,Y] = meshgrid(-1:0.02:1,-1:0.02:1);
+  [T,R] = cart2pol(X,Y) ;
+  U = R.^(2/3).*sin(2*T/3) ;
+  u = surf(X,Y,U) ;
+end ;
     
 
 %%
@@ -353,11 +375,11 @@ for t = 1: Nbtri
   GRAD_UH(t,:)=grad_uh;
   Uaff(t,:) = [a , b , c];
   % Approximation de l'intégrale L2 par les valeurs aux 3 points-milieux
-  grad_1 = gradu(x1,y1)-grad_uh ;
+  grad_1 = gradu(x1,y1,cas)-grad_uh ;
   norm_1 = grad_1'*grad_1 ;
-  grad_2 = gradu(x2,y2)-grad_uh ;
+  grad_2 = gradu(x2,y2,cas)-grad_uh ;
   norm_2 = grad_2'*grad_2 ;
-  grad_3 = gradu(x3,y3)-grad_uh ;
+  grad_3 = gradu(x3,y3,cas)-grad_uh ;
   norm_3 = grad_3'*grad_3 ;
   
   % Pour le calcul de l'aire du triangle
@@ -377,25 +399,26 @@ Err = sqrt(Err_2) ;
 %Problème d'affichage des chiffres significatifs
 % --> format long g
 
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            Affichage Erreur           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %Valeurs calculées pour 5 maillages différents
-Err_4 = [1.1790 ; 0.5835 ; 0.2910 ; 0.145422223962109];
-h_4 = [1/2; 1/4; 1/8; 1/16];
-V_4 = [20; 88; 368; 1504];
-
-    %Affichage
-
-loglog(V_4, Err_4);
-loglog(h_4, Err_4);
-
-
-    %Calcul de la pente
-pente_V = (log(0.145422223962109) - log(1.1790))/ log(1504/20)
-pente_h = (log(1.1790) - log(0.145422223962109))/log(8)
+% Err_4 = [1.1790 ; 0.5835 ; 0.2910 ; 0.145422223962109];
+% h_4 = [1/2; 1/4; 1/8; 1/16];
+% V_4 = [20; 88; 368; 1504];
+% 
+%     %Affichage
+% 
+% loglog(V_4, Err_4);
+% loglog(h_4, Err_4);
+% 
+% 
+%     %Calcul de la pente
+% pente_V = (log(0.145422223962109) - log(1.1790))/ log(1504/20)
+% pente_h = (log(1.1790) - log(0.145422223962109))/log(8)
 
 
 %%
@@ -475,12 +498,14 @@ affiche(s_h,Numtri,Coorneu,"Potentiel");
 
 ss_h=zeros(Nb_faces_int-1,1);
 for i=2:Nb_faces_int
-    ss_h(i)=(s_h(Numface(i,1))+s_h(Numface(i,2)))/2;
+    ss_h(i-1)=(s_h(Numface(i,1))+s_h(Numface(i,2)))/2;
 end
 
+%grad de sh
 
-eta_s_h_2 = zeros(Nbtri,1); % epsilon = grad(u_h-ss_h)
-% Calcul de (grad(ss_h-uh))^2 
+eta_s_h_2 = zeros(Nbtri,1);
+GRAD_SH=sparse(Nbtri,2);
+% Calcul de (grad(u-uh))^2 
 for t = 1: Nbtri
   % Intégrale L2 sur tous les triangles
   Faces = [ ] ;
@@ -523,15 +548,15 @@ for t = 1: Nbtri
   % Si le triangle est interne au domaine : 3 sommets/3 valeurs connus
   % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 3)
-    u1 = U_h(Faces(1)-1)-ss_h(Faces(1)-1) ;
+    u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
     y1 = XF(Faces(1)-1,2) ;
   
-    u2 = U_h(Faces(2)-1)-ss_h(Faces(2)-1) ;
+    u2 = ss_h(Faces(2)-1) ;
     x2 = XF(Faces(2)-1,1) ;
     y2 = XF(Faces(2)-1,2) ;    
  
-    u3 = U_h(Faces(3)-1)-ss_h(Faces(1)-1) ;
+    u3 = ss_h(Faces(3)-1) ;
     x3 = XF(Faces(3)-1,1) ;
     y3 = XF(Faces(3)-1,2) ;
   end ; 
@@ -539,11 +564,11 @@ for t = 1: Nbtri
   % Si le triangle a 1 face au bord : 2 sommets internes/2 valeurs connus
   % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 2)
-    u1 = U_h(Faces(1)-1)-ss_h(Faces(1)-1) ;
+    u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
     y1 = XF(Faces(1)-1,2) ;
   
-    u2 = U_h(Faces(2)-1)-ss_h(Faces(2)-1) ;
+    u2 = ss_h(Faces(2)-1) ;
     x2 = XF(Faces(2)-1,1) ;
     y2 = XF(Faces(2)-1,2) ;    
      
@@ -557,7 +582,7 @@ for t = 1: Nbtri
         u3 = 0 ;
     end ; 
     if cas == 2 
-        u3 = 0 ;
+        u3 = frontiere(x3,y3) ;
     end ;
     
   end ;   
@@ -565,7 +590,7 @@ for t = 1: Nbtri
   % Si le triangle a 2 faces au bord : 1 sommet interne/1 valeur connus
   % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 1)
-    u1 = U_h(Faces(1)-1)-ss_h(Faces(1)-1) ;
+    u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
     y1 = XF(Faces(1)-1,2) ;
   
@@ -578,7 +603,7 @@ for t = 1: Nbtri
         u2 = 0 ;
     end ; 
     if cas == 2 
-        u2 = 0 ;
+        u2 = frontiere(x2,y2) ;
     end ;
     
     % Valeur nulle au bord, calcul des coordonnées du centre de la 2eme face
@@ -590,7 +615,7 @@ for t = 1: Nbtri
         u3 = 0 ;
     end ; 
     if cas == 2 
-        u3 = 0 ;
+        u3 = frontiere(x3,y3) ;
     end ;
   end ; 
   
@@ -599,27 +624,17 @@ for t = 1: Nbtri
   b = ((u1-u2)*(x1-x3) - (u1-u3)*(x1-x2)) / ((y1-y2)*(x1-x3) - (y1-y3)*(x1-x2)) ;
   c = u1-a*x1-b*y1;
 
-  grad_uh_sh = [ a ; b ] ;
-  % Approximation de l'intégrale L2 par les valeurs aux 3 points-milieux
-  grad_1 = grad_uh_sh ;
-  norm_1 = grad_1'*grad_1 ;
-  grad_2 = grad_uh_sh ;
-  norm_2 = grad_2'*grad_2 ;
-  grad_3 = grad_uh_sh ;
-  norm_3 = grad_3'*grad_3 ;
-  
-  % Pour le calcul de l'aire du triangle
-  S1 = Coorneu(Numtri(t,1),:) ;
-  S2 = Coorneu(Numtri(t,2),:) ;
-  S3 = Coorneu(Numtri(t,3),:) ;
- 
-  % Ajout à la somme sur les triangles
-  eta_s_h_2(t) = (normetri([S1,S2,S3])/3)*(norm_1 + norm_2 + norm_3) ;
+  grad_sh = [ a ; b ] ;
+  GRAD_SH(t,:)=grad_sh;
 end ;
 
 
-
-
+for t=1:Nbtri
+    S1 = Coorneu(Numtri(t,1),:) ;
+    S2 = Coorneu(Numtri(t,2),:) ;
+    S3 = Coorneu(Numtri(t,3),:) ;
+    eta_s_h_2(t)=normetri([S1,S2,S3])*((GRAD_UH(t,1)-GRAD_SH(t,1))^2 + (GRAD_UH(t,2)-GRAD_SH(t,2))^2);
+end
 
 % Calcul de l'erreur grad uh +sigma_h
 eta_sigma_2=sparse(Nbtri,1);
@@ -636,22 +651,20 @@ eta_sigma_2=sparse(Nbtri,1);
      end
  end  
  
- 
 eta_2=sparse(Nbtri,1);
 for i=1:Nbtri
     eta_2(i)=eta_sigma_2(i)+eta_s_h_2(i);
 end
+eta1=sqrt(sum(eta_2));
+%eta2=sqrt(sum(eta_sigma_2)+(U_h-ss_h)'*KK*(U_h-ss_h));
+Ieff=eta1/Err;
 
-eta=sqrt(sum(eta_2));
-X_K=zeros(Nbtri,2);
-for i=1:Nbtri
-    S1 = Coorneu(Numtri(i,1),:) ;
-    S2 = Coorneu(Numtri(i,2),:) ;
-    S3 = Coorneu(Numtri(i,3),:) ;
-    S_k=(S1+S2+S3)/3;
-    X_K(i,:)=S_k;    
-end
-Ieff=eta/Err;
+
+
+    
+    
+    
+
 
     
     
