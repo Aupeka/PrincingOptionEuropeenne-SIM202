@@ -1,5 +1,6 @@
 
 
+
 %%
 % -------------------------------- %
 %        Lecture du maillage       %
@@ -168,7 +169,7 @@ for i = 2:Nb_faces_int %Face F
         %informations sur les deux triangles annexes à la face qu'on
         %considère
         
-        BB = [BB; (K_1 + K_2)*f(x,y)/3];
+        BB = [BB; (K_1 + K_2)*f(x,y,cas)/3];
         
           end;
       end;
@@ -230,19 +231,6 @@ if cas==2
     U_h= KK\(-G);
 end
 
-if cas == 1 
-    figure;
-    [X,Y] = meshgrid(0:0.02:1,0:0.02:1);
-    u = surf(X,Y,sin(pi*X).*sin(pi*Y)) ;
-end
-if cas == 2
-  figure;
-  [X,Y] = meshgrid(-1:0.02:1,-1:0.02:1);
-  [T,R] = cart2pol(X,Y) ;
-  U = R.^(2/3).*sin(2*T/3) ;
-  u = surf(X,Y,U) ;
-end ;
-    
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -251,6 +239,7 @@ end ;
     
 Err_2 = 0; % epsilon = grad(u-uh)
 GRAD_UH=sparse(Nbtri,2);
+GRAD_U_UH=sparse(Nbtri,2);
 Uaff = sparse(Nbtri, 3);
 % Calcul de (grad(u-uh))^2 
 for t = 1: Nbtri
@@ -389,6 +378,7 @@ for t = 1: Nbtri
  
   % Ajout à la somme sur les triangles
   Err_2 = Err_2 + (normetri([S1,S2,S3])/3)*(norm_1 + norm_2 + norm_3) ;
+  GRAD_U_UH(t)=sqrt((normetri([S1,S2,S3])/3)*(norm_1 + norm_2 + norm_3));
 end ;
 
 % Calcul de grad(u-uh)
@@ -406,19 +396,23 @@ Err = sqrt(Err_2) ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %Valeurs calculées pour 5 maillages différents
-% Err_4 = [1.1790 ; 0.5835 ; 0.2910 ; 0.145422223962109];
-% h_4 = [1/2; 1/4; 1/8; 1/16];
-% V_4 = [20; 88; 368; 1504];
-% 
-%     %Affichage
-% 
-% loglog(V_4, Err_4);
-% loglog(h_4, Err_4);
-% 
-% 
-%     %Calcul de la pente
-% pente_V = (log(0.145422223962109) - log(1.1790))/ log(1504/20)
-% pente_h = (log(1.1790) - log(0.145422223962109))/log(8)
+Err_4 = [1.1790 ; 0.5835 ; 0.2910 ; 0.145422223962109];
+eta_4 = [1.4774 ; 0.7253 ; 0.3581 ; 0.1783 ];
+Ieff_4 = [1.2531 ; 1.2431 ; 1.2304 ; 1.2263 ];
+h_4 = [1/2; 1/4; 1/8; 1/16];
+V_4 = [20; 88; 368; 1504];
+
+    %Affichage
+figure(1);
+loglog(V_4, Err_4,'red');
+hold on
+loglog(V_4, eta_4,'blue');
+figure(2);
+semilogx(V_4,Ieff_4);
+
+    %Calcul de la pente
+pente_V = (log(0.145422223962109) - log(1.1790))/ log(1504/20);
+pente_h = (log(1.1790) - log(0.145422223962109))/log(8);
 
 
 %%
@@ -434,8 +428,6 @@ uh = plot3(XF(:,1), XF(:,2), U_h, 'o') ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            Reconstruction potentiel     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 s_h = zeros(Nbpt, 1) ;
  
 for i = 1:Nbpt
@@ -476,6 +468,7 @@ affiche(s_h,Numtri,Coorneu,"Potentiel");
     
    f_h=sparse(Nbtri,1); % Vecteur des valeurs moyennes de f /d sur toutes les maille
    sigma_h=sparse(Nbtri,1);
+   XK=zeros(Nbtri,2);
    for i=1:Nbtri
       x1= Coorneu(Numtri(i,1),1);
       y1= Coorneu(Numtri(i,1),2);
@@ -483,8 +476,10 @@ affiche(s_h,Numtri,Coorneu,"Potentiel");
       y2= Coorneu(Numtri(i,2),2);
       x3= Coorneu(Numtri(i,3),1);
       y3= Coorneu(Numtri(i,3),2);
-      f_h(i)=f((x1+x2)/2,(y1+y2)/2)+f((x3+x2)/2,(y3+y2)/2)+f((x1+x3)/2,(y1+y3)/2);
+      f_h(i)=f((x1+x2)/2,(y1+y2)/2,cas)+f((x3+x2)/2,(y3+y2)/2,cas)+f((x1+x3)/2,(y1+y3)/2,cas);
       f_h(i)=f_h(i)/6; %on a divisé par 6 car d=2
+      XK(i,1)= (x1+x2+x3)/3;
+      XK(i,2)= (y1+y2+y3)/3;
    end
 
    
@@ -582,7 +577,7 @@ for t = 1: Nbtri
         u3 = 0 ;
     end ; 
     if cas == 2 
-        u3 = frontiere(x3,y3) ;
+        u3 = (s_h(Numaretes(arete,1))+s_h(Numaretes(arete,2)))/2 ;
     end ;
     
   end ;   
@@ -603,7 +598,7 @@ for t = 1: Nbtri
         u2 = 0 ;
     end ; 
     if cas == 2 
-        u2 = frontiere(x2,y2) ;
+        u2 = (s_h(Numaretes(arete_1,1))+s_h(Numaretes(arete_1,2)))/2 ;
     end ;
     
     % Valeur nulle au bord, calcul des coordonnées du centre de la 2eme face
@@ -615,11 +610,11 @@ for t = 1: Nbtri
         u3 = 0 ;
     end ; 
     if cas == 2 
-        u3 = frontiere(x3,y3) ;
+        u3 = (s_h(Numaretes(arete_2,1))+s_h(Numaretes(arete_2,2)))/2 ;
     end ;
   end ; 
   
-  % Calcul du gradient de uh affine, connaissant 3 coordonnées et 3 valeurs
+  % Calcul du gradient de sh affine, connaissant 3 coordonnées et 3 valeurs
   a = ((u1-u2)*(y1-y3) - (u1-u3)*(y1-y2)) / ((x1-x2)*(y1-y3) - (x1-x3)*(y1-y2)) ;
   b = ((u1-u2)*(x1-x3) - (u1-u3)*(x1-x2)) / ((y1-y2)*(x1-x3) - (y1-y3)*(x1-x2)) ;
   c = u1-a*x1-b*y1;
@@ -651,13 +646,25 @@ eta_sigma_2=sparse(Nbtri,1);
      end
  end  
  
-eta_2=sparse(Nbtri,1);
+eta_2=zeros(Nbtri,1);
 for i=1:Nbtri
     eta_2(i)=eta_sigma_2(i)+eta_s_h_2(i);
 end
 eta1=sqrt(sum(eta_2));
-%eta2=sqrt(sum(eta_sigma_2)+(U_h-ss_h)'*KK*(U_h-ss_h));
 Ieff=eta1/Err;
+
+eta=sqrt(eta_2);
+figure(10);
+plot3(XK(:,1),XK(:,2),eta,'o','Color','blue');
+figure(20);
+plot3(XK(:,1),XK(:,2),GRAD_U_UH,'o','Color','red');
+
+
+
+    
+    
+    
+
 
 
 
