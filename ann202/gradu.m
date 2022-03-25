@@ -5,6 +5,12 @@ if cas == 1
 end ;
 if cas == 2
     [t,r] = cart2pol(x,y) ;
+    if y>=0
     pol = (2/3)*r^(-1/3)*[sin(2*t/3) ; cos(2*t/3)] ;
     vec = [ cos(t)*pol(1) - sin(t)*pol(2) ; sin(t)*pol(1) + cos(t)*pol(2) ] ;
+    else
+        t=t+2*pi;
+        pol = (2/3)*r^(-1/3)*[sin(2*t/3) ; cos(2*t/3)] ;
+        vec = [ cos(t)*pol(1) - sin(t)*pol(2) ; sin(t)*pol(1) + cos(t)*pol(2) ] ;
+    end
 end ;
