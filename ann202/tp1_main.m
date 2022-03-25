@@ -1,6 +1,4 @@
 
-
-
 %%
 % -------------------------------- %
 %        Lecture du maillage       %
@@ -8,7 +6,7 @@
 
 clear all
 global cas ;
-cas = 1 ;
+cas = 2 ;
 if cas == 1 
     nom_maillage = 'Cas1.msh' ;
 end ;
@@ -22,19 +20,19 @@ end ;
 
 %%
 % ---------------------------------------------------------- %
-%     DÃ©finition des donnÃ©es utiles pour notre problÃ¨me      %
+%     Définition des données utiles pour notre problème      %
 % ---------------------------------------------------------- %
 
-    % Matrice des numÃ©ros des triangles des faces intÃ©rieures. Les derniÃ¨res lignes (nulles) seront ignorÃ©es ensuite
+    % Matrice des numéros des triangles des faces intérieures. Les dernières lignes (nulles) seront ignorées ensuite
 Reffacetri = zeros(3*Nbtri, 2);     
 
-    % Matrice des sommets des faces intÃ©rieures. Contient un premier Ã©lÃ©ment pour les besoins du code, qui sera ignorÃ© ensuite
+    % Matrice des sommets des faces intérieures. Contient un premier élément pour les besoins du code, qui sera ignoré ensuite
 Numface = [0 0];
 
     % Matrice des sommets des faces du bord, Nbaretes etant le nb de faces sur le bord
 Reffacetri_bord = zeros(Nbaretes, 1); 
 
-    %Nb de faces intÃ©rieures (Nb_faces_int)
+    %Nb de faces intérieures (Nb_faces_int)
 s = 1;
 
     %Remplissage --> Boucle sur les triangles
@@ -45,7 +43,7 @@ for l=1:Nbtri
         J = Numtri(l,i+1);
         inNumface = is_in([min(I,J),max(I,J)], Numface);
         if (bord(I,J, Refneu) == 0 )            %Si F n'est pas sur le bord
-          if (inNumface==0)                     %Si F n'est pas dÃ©jÃ  dans la liste
+          if (inNumface==0)                     %Si F n'est pas déjà dans la liste
             s=s+1;
             Numface = [Numface ; [min(I,J),max(I,J)]];
             Reffacetri(s,1) = l;
@@ -60,7 +58,7 @@ for l=1:Nbtri
     J = Numtri(l,1);
         inNumface = is_in([min(I,J),max(I,J)], Numface);
         if bord(I,J, Refneu) == 0             %Si F n'est pas sur le bord
-          if (inNumface==0)                   %Si F n'est pas dÃ©jÃ  dans la liste
+          if (inNumface==0)                   %Si F n'est pas déjà dans la liste
             s=s+1;
             Numface = [Numface ; [min(I,J),max(I,J)]];
             Reffacetri(s,1) = l;
@@ -82,35 +80,35 @@ end % for l
 
 %%
 % ---------------------------------------------------------- %
-%   DÃ©finition des matrices de masse et du second membre     %
+%   Définition des matrices de masse et du second membre     %
 % ---------------------------------------------------------- %
 
 
 Nb_faces_int = length(Numface);
-XF = [] ; % Matrice des coordonnÃ©es des milieux des faces
+XF = [] ; % Matrice des coordonnées des milieux des faces
 
 
-    %DÃ©finition de KK
+    %Définition de KK
 KK = sparse(Nb_faces_int-1,Nb_faces_int-1);
 
     %Definition de BB
 BB = [];
 
-% /!\ Le premier Ã©lÃ©ment de Numface n'est pas un vrai Ã©lÃ©ment
+% /!\ Le premier élément de Numface n'est pas un vrai élément
 for i = 2:Nb_faces_int %Face F
     
         %Id face "i"
     S = Numface(i,:); 
-    S11 = Coorneu(S(1),:);  % CoordonnÃ©es du premier sommet de la face 
-    S12 = Coorneu(S(2),:);  % CoordonnÃ©es du second sommet de la face
+    S11 = Coorneu(S(1),:);  % Coordonnées du premier sommet de la face 
+    S12 = Coorneu(S(2),:);  % Coordonnées du second sommet de la face
     xF1 = milieu(S11,S12);  % Milieu de la face
-    nF1 = normale(S11,S12); % Normale Ã  la face
+    nF1 = normale(S11,S12); % Normale à la face
           
     for j = 2:Nb_faces_int %Face F'
       
-        %Les deux faces appartiennent-elles au mÃªme triangle ?
-      triangle_commun = intersect(Reffacetri(i,:), Reffacetri(j,:)); % NumÃ©ro dans Numtri de l'Ã©ventuel triangle commun 
-      if (isempty(triangle_commun) ~=1) % Si les deux faces sont sur le mÃªme triangle
+        %Les deux faces appartiennent-elles au même triangle ?
+      triangle_commun = intersect(Reffacetri(i,:), Reffacetri(j,:)); % Numéro dans Numtri de l'éventuel triangle commun 
+      if (isempty(triangle_commun) ~=1) % Si les deux faces sont sur le même triangle
       
           %Id face "j"
         S = Numface(j,:);
@@ -119,9 +117,9 @@ for i = 2:Nb_faces_int %Face F
         nF2 = normale(S21,S22);
         xF2 = milieu(S21,S22);
             
-          if (i ~= j)%Les deux faces sont pas les mÃªmes
+          if (i ~= j)%Les deux faces sont pas les mêmes
             
-              % VÃ©rification de l'orientation de la normale --> Sinon rÃ©orientation vers l'extÃ©rieur du triangle
+              % Vérification de l'orientation de la normale --> Sinon réorientation vers l'extérieur du triangle
            if (nF1'*vec(xF2,xF1) <= 0) 
             nF1 = -nF1;               
           end ;
@@ -136,16 +134,16 @@ for i = 2:Nb_faces_int %Face F
             T2 = Coorneu(T(2),:);
             T3 = Coorneu(T(3),:);
 
-            % Calcul du coefficient associÃ© dans K
+            % Calcul du coefficient associé dans K
             KK(i-1,j-1) = ((normef([S11;S12])*normef([S21;S22]))/normetri([T1,T2,T3]))*(nF1'*nF2);
           
           else %i=j
-            % Sinon, on ne considÃ¨re qu'une seule face
+            % Sinon, on ne considère qu'une seule face
         x = xF1(1);
         y = xF1(2);
         XF = [ XF ; x y ] ;
         
-            % Calcul de l'aire des deux triangles adjacents Ã  F
+            % Calcul de l'aire des deux triangles adjacents à F
         tri = Reffacetri(i,:) ; 
         tri_1 = Numtri(tri(1), :) ;
         tri_2 = Numtri(tri(2), :) ;
@@ -165,9 +163,9 @@ for i = 2:Nb_faces_int %Face F
         % Calcul du second membre %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-        %On le calcul ici car la formule trouvÃ©e demande d'avoir des
-        %informations sur les deux triangles annexes Ã  la face qu'on
-        %considÃ¨re
+        %On le calcul ici car la formule trouvée demande d'avoir des
+        %informations sur les deux triangles annexes à la face qu'on
+        %considère
         
         BB = [BB; (K_1 + K_2)*f(x,y,cas)/3];
         
@@ -178,37 +176,37 @@ for i = 2:Nb_faces_int %Face F
 end; %i
 
 if cas==2
-Surface = sparse(Nb_faces_int-1, Nbaretes) ;  % Matrice de rigiditÃ© surfacique 
+Surface = sparse(Nb_faces_int-1, Nbaretes) ;  % Matrice de rigidité surfacique 
   bb = [] ; % Fonction du bord aux milieux des faces du bord
   for j = 1: Nbaretes
   S = Numaretes(j,:); 
-  S11 = Coorneu(S(1),:);  % CoordonnÃ©es du premier sommet de la face 
-  S12 = Coorneu(S(2),:);  % CoordonnÃ©es du second sommet de la face
+  S11 = Coorneu(S(1),:);  % Coordonnées du premier sommet de la face 
+  S12 = Coorneu(S(2),:);  % Coordonnées du second sommet de la face
   xF1 = milieu(S11,S12);  % Milieu de la face
-  nF1 = normale(S11,S12); % Normale Ã  la face
+  nF1 = normale(S11,S12); % Normale à la face
   for i = 2:Nb_faces_int
-    % MÃªme procÃ©dure pour la deuxiÃ¨me face
+    % Même procédure pour la deuxième face
     S = Numface(i,:);
     S21 = Coorneu(S(1),:);
     S22 = Coorneu(S(2),:);
     nF2 = normale(S21,S22);
     xF2 = milieu(S21,S22);
-      if (nF1'*vec(xF2,xF1) <= 0) % VÃ©rification de l'orientation de la normale
-        nF1 = -nF1;               % Sinon rÃ©orientation vers l'extÃ©rieur du triangle
+      if (nF1'*vec(xF2,xF1) <= 0) % Vérification de l'orientation de la normale
+        nF1 = -nF1;               % Sinon réorientation vers l'extérieur du triangle
       end ;
       if (nF2'*vec(xF1,xF2) <= 0)
        nF2 = -nF2;
       end ;
     
-      tricom = intersect(Reffacetri(i,:), Reffacetri_bord(j,:)); % NumÃ©ro dans Numtri de l'Ã©ventuel triangle commun 
-      if (isempty(tricom) ~=1) % Si les deux faces sont sur le mÃªme triangle
+      tricom = intersect(Reffacetri(i,:), Reffacetri_bord(j,:)); % Numéro dans Numtri de l'éventuel triangle commun 
+      if (isempty(tricom) ~=1) % Si les deux faces sont sur le même triangle
      
         M = Numtri(tricom,:);    
         P1 = Coorneu(M(1),:);
         P2 = Coorneu(M(2),:);
         P3 = Coorneu(M(3),:);
         
-        % Calcul du coefficient associÃ© dans G
+        % Calcul du coefficient associé dans G
         Surface(i-1,j) = ((normef([S11;S12])*normef([S21;S22]))/normetri([P1,P2,P3]))*(nF1'*nF2);
       end ;  
     end ; 
@@ -219,10 +217,9 @@ Surface = sparse(Nb_faces_int-1, Nbaretes) ;  % Matrice de rigiditÃ© surfacique
   % Calcul de G
   G = Surface*bb ;
 end
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%          Resolution  du ProblÃ¨me        %
+%          Resolution  du Problème        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if cas ==1
 U_h = KK\BB;
@@ -243,7 +240,7 @@ GRAD_U_UH=sparse(Nbtri,2);
 Uaff = sparse(Nbtri, 3);
 % Calcul de (grad(u-uh))^2 
 for t = 1: Nbtri
-  % IntÃ©grale L2 sur tous les triangles
+  % Intégrale L2 sur tous les triangles
   Faces = [ ] ;
   Faces_bord = [ ] ;
   
@@ -252,7 +249,7 @@ for t = 1: Nbtri
   i = 2;
   while (length(Faces)<3 && i<= length(Reffacetri))
     if (any(Reffacetri(i,:) == t))
-        Faces = [ Faces ; i] ; % RelevÃ© du numÃ©ro de la face interne trouvÃ©e
+        Faces = [ Faces ; i] ; % Relevé du numéro de la face interne trouvée
     end ;
     i = i+1 ;
   end ;
@@ -282,7 +279,7 @@ for t = 1: Nbtri
   end ;
   
   % Si le triangle est interne au domaine : 3 sommets/3 valeurs connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 3)
     u1 = U_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
@@ -298,7 +295,7 @@ for t = 1: Nbtri
   end ; 
   
   % Si le triangle a 1 face au bord : 2 sommets internes/2 valeurs connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 2)
     u1 = U_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
@@ -308,7 +305,7 @@ for t = 1: Nbtri
     x2 = XF(Faces(2)-1,1) ;
     y2 = XF(Faces(2)-1,2) ;    
      
-    % Valeur au bord et coordonnÃ©es du centre de la face externe     
+    % Valeur au bord et coordonnées du centre de la face externe     
     arete = Faces_bord(1) ;
     Coor = milieu(Coorneu(Numaretes(arete,1),:), Coorneu(Numaretes(arete,2),:)) ;
     x3 = Coor(1) ;
@@ -324,13 +321,13 @@ for t = 1: Nbtri
   end ;   
   
   % Si le triangle a 2 faces au bord : 1 sommet interne/1 valeur connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 1)
     u1 = U_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
     y1 = XF(Faces(1)-1,2) ;
   
-    % Valeur au bord et coordonnÃ©es du centre de la 1ere face externe
+    % Valeur au bord et coordonnées du centre de la 1ere face externe
     arete_1 = Faces_bord(1) ;
     Coor = milieu(Coorneu(Numaretes(arete_1,1),:), Coorneu(Numaretes(arete_1,2),:)) ;
     x2 = Coor(1) ;
@@ -342,7 +339,7 @@ for t = 1: Nbtri
         u2 = frontiere(x2,y2) ;
     end ;
     
-    % Valeur nulle au bord, calcul des coordonnÃ©es du centre de la 2eme face
+    % Valeur nulle au bord, calcul des coordonnées du centre de la 2eme face
     arete_2 = Faces_bord(2) ;
     Coor = milieu(Coorneu(Numaretes(arete_2,1),:), Coorneu(Numaretes(arete_2,2),:)) ;
     x3 = Coor(1) ;
@@ -355,7 +352,7 @@ for t = 1: Nbtri
     end ;
   end ; 
   
-  % Calcul du gradient de uh affine, connaissant 3 coordonnÃ©es et 3 valeurs
+  % Calcul du gradient de uh affine, connaissant 3 coordonnées et 3 valeurs
   a = ((u1-u2)*(y1-y3) - (u1-u3)*(y1-y2)) / ((x1-x2)*(y1-y3) - (x1-x3)*(y1-y2)) ;
   b = ((u1-u2)*(x1-x3) - (u1-u3)*(x1-x2)) / ((y1-y2)*(x1-x3) - (y1-y3)*(x1-x2)) ;
   c = u1-a*x1-b*y1;
@@ -363,7 +360,7 @@ for t = 1: Nbtri
   grad_uh = [ a ; b ] ;
   GRAD_UH(t,:)=grad_uh;
   Uaff(t,:) = [a , b , c];
-  % Approximation de l'intÃ©grale L2 par les valeurs aux 3 points-milieux
+  % Approximation de l'intégrale L2 par les valeurs aux 3 points-milieux
   grad_1 = gradu(x1,y1,cas)-grad_uh ;
   norm_1 = grad_1'*grad_1 ;
   grad_2 = gradu(x2,y2,cas)-grad_uh ;
@@ -376,7 +373,7 @@ for t = 1: Nbtri
   S2 = Coorneu(Numtri(t,2),:) ;
   S3 = Coorneu(Numtri(t,3),:) ;
  
-  % Ajout Ã  la somme sur les triangles
+  % Ajout à la somme sur les triangles
   Err_2 = Err_2 + (normetri([S1,S2,S3])/3)*(norm_1 + norm_2 + norm_3) ;
   GRAD_U_UH(t)=sqrt((normetri([S1,S2,S3])/3)*(norm_1 + norm_2 + norm_3));
 end ;
@@ -386,20 +383,21 @@ Err = sqrt(Err_2) ;
 
 [Err ; (Nb_faces_int -1)]
 
-%ProblÃ¨me d'affichage des chiffres significatifs
+%Problème d'affichage des chiffres significatifs
 % --> format long g
-
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            Affichage Erreur           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %Valeurs calculÃ©es pour 5 maillages diffÃ©rents
+    %Valeurs calculées pour 5 maillages différents
 Err_4 = [1.1790 ; 0.5835 ; 0.2910 ; 0.145422223962109];
+Err_4cas2=[ 0.1877 ; 0.1387 ; 0.0898 ];
 eta_4 = [1.4774 ; 0.7253 ; 0.3581 ; 0.1783 ];
 Ieff_4 = [1.2531 ; 1.2431 ; 1.2304 ; 1.2263 ];
-h_4 = [1/2; 1/4; 1/8; 1/16];
+h_4 = [ 1/4; 1/8; 1/16];
+V_4cas2=[ 76 ; 272 ; 1120 ];
 V_4 = [20; 88; 368; 1504];
 
     %Affichage
@@ -407,10 +405,21 @@ figure(1);
 loglog(V_4, Err_4,'red');
 hold on
 loglog(V_4, eta_4,'blue');
+
+legend('Erreur','eta');
 figure(2);
 semilogx(V_4,Ieff_4);
 
+figure(8);
+loglog(h_4,Err_4cas2)
+title('Erreur en fonction de h');
+
+figure(9);
+loglog(V_4cas2,Err_4cas2)
+title('Erreur en fonction de V')
     %Calcul de la pente
+pente_Vcas2=(log(0.0898)-log(0.1877))/log(1120/76)
+pente_hcas2=(log(0.1877)-log(0.0898))/log(8)
 pente_V = (log(0.145422223962109) - log(1.1790))/ log(1504/20);
 pente_h = (log(1.1790) - log(0.145422223962109))/log(8);
 
@@ -450,18 +459,18 @@ for i = 1:Nbpt
 end;
 
 
-figure;
+figure(15);
 affiche(s_h,Numtri,Coorneu,"Potentiel");
 
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%            Reconstruction flux Ã©quilibrÃ©     %
+%            Reconstruction flux équilibré     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Dans cette partie on a choisi de ne calculer que le vecteur f moyen sur
 %tous les triangles sachant que calculer sigma_h ne sert pas dans la suite
-%vu que la partie gradient de u_h s'annule dans l'erreur Ã  posteriori.
+%vu que la partie gradient de u_h s'annule dans l'erreur à posteriori.
 
 
     %Calcul de f_h
@@ -477,7 +486,7 @@ affiche(s_h,Numtri,Coorneu,"Potentiel");
       x3= Coorneu(Numtri(i,3),1);
       y3= Coorneu(Numtri(i,3),2);
       f_h(i)=f((x1+x2)/2,(y1+y2)/2,cas)+f((x3+x2)/2,(y3+y2)/2,cas)+f((x1+x3)/2,(y1+y3)/2,cas);
-      f_h(i)=f_h(i)/6; %on a divisÃ© par 6 car d=2
+      f_h(i)=f_h(i)/6; %on a divisé par 6 car d=2
       XK(i,1)= (x1+x2+x3)/3;
       XK(i,2)= (y1+y2+y3)/3;
    end
@@ -486,7 +495,7 @@ affiche(s_h,Numtri,Coorneu,"Potentiel");
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%            Erreur Ã  posteriori      %
+%            Erreur à posteriori      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 %Calcul de l'erreur grad uh-sh
@@ -502,7 +511,7 @@ eta_s_h_2 = zeros(Nbtri,1);
 GRAD_SH=sparse(Nbtri,2);
 % Calcul de (grad(u-uh))^2 
 for t = 1: Nbtri
-  % IntÃ©grale L2 sur tous les triangles
+  % Intégrale L2 sur tous les triangles
   Faces = [ ] ;
   Faces_bord = [ ] ;
   
@@ -511,7 +520,7 @@ for t = 1: Nbtri
   i = 2;
   while (length(Faces)<3 && i<= length(Reffacetri))
     if (any(Reffacetri(i,:) == t))
-        Faces = [ Faces ; i] ; % RelevÃ© du numÃ©ro de la face interne trouvÃ©e
+        Faces = [ Faces ; i] ; % Relevé du numéro de la face interne trouvée
     end ;
     i = i+1 ;
   end ;
@@ -541,7 +550,7 @@ for t = 1: Nbtri
   end ;
   
   % Si le triangle est interne au domaine : 3 sommets/3 valeurs connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 3)
     u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
@@ -557,7 +566,7 @@ for t = 1: Nbtri
   end ; 
   
   % Si le triangle a 1 face au bord : 2 sommets internes/2 valeurs connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 2)
     u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
@@ -567,7 +576,7 @@ for t = 1: Nbtri
     x2 = XF(Faces(2)-1,1) ;
     y2 = XF(Faces(2)-1,2) ;    
      
-    % Valeur au bord et coordonnÃ©es du centre de la face externe     
+    % Valeur au bord et coordonnées du centre de la face externe     
     arete = Faces_bord(1) ;
     Coor = milieu(Coorneu(Numaretes(arete,1),:), Coorneu(Numaretes(arete,2),:)) ;
     x3 = Coor(1) ;
@@ -583,13 +592,13 @@ for t = 1: Nbtri
   end ;   
   
   % Si le triangle a 2 faces au bord : 1 sommet interne/1 valeur connus
-  % -1 car numÃ©ros dÃ©calÃ©s, voir dÃ©claration de Numface
+  % -1 car numéros décalés, voir déclaration de Numface
   if (length(Faces) == 1)
     u1 = ss_h(Faces(1)-1) ;
     x1 = XF(Faces(1)-1,1) ;
     y1 = XF(Faces(1)-1,2) ;
   
-    % Valeur au bord et coordonnÃ©es du centre de la 1ere face externe
+    % Valeur au bord et coordonnées du centre de la 1ere face externe
     arete_1 = Faces_bord(1) ;
     Coor = milieu(Coorneu(Numaretes(arete_1,1),:), Coorneu(Numaretes(arete_1,2),:)) ;
     x2 = Coor(1) ;
@@ -601,7 +610,7 @@ for t = 1: Nbtri
         u2 = (s_h(Numaretes(arete_1,1))+s_h(Numaretes(arete_1,2)))/2 ;
     end ;
     
-    % Valeur nulle au bord, calcul des coordonnÃ©es du centre de la 2eme face
+    % Valeur nulle au bord, calcul des coordonnées du centre de la 2eme face
     arete_2 = Faces_bord(2) ;
     Coor = milieu(Coorneu(Numaretes(arete_2,1),:), Coorneu(Numaretes(arete_2,2),:)) ;
     x3 = Coor(1) ;
@@ -614,7 +623,7 @@ for t = 1: Nbtri
     end ;
   end ; 
   
-  % Calcul du gradient de sh affine, connaissant 3 coordonnÃ©es et 3 valeurs
+  % Calcul du gradient de sh affine, connaissant 3 coordonnées et 3 valeurs
   a = ((u1-u2)*(y1-y3) - (u1-u3)*(y1-y2)) / ((x1-x2)*(y1-y3) - (x1-x3)*(y1-y2)) ;
   b = ((u1-u2)*(x1-x3) - (u1-u3)*(x1-x2)) / ((y1-y2)*(x1-x3) - (y1-y3)*(x1-x2)) ;
   c = u1-a*x1-b*y1;
@@ -654,23 +663,17 @@ eta1=sqrt(sum(eta_2));
 Ieff=eta1/Err;
 
 eta=sqrt(eta_2);
-figure(10);
-plot3(XK(:,1),XK(:,2),eta,'o','Color','blue');
-figure(20);
-plot3(XK(:,1),XK(:,2),GRAD_U_UH,'o','Color','red');
 
+for i=1:Nbtri
+    a=Coorneu(Numtri(i,1),:);
+    b=Coorneu(Numtri(i,2),:);
+    c=Coorneu(Numtri(i,3),:);
+    X = [a(1),b(1),c(1)];
+    Y = [a(2),b(2),c(2)];
+    fill(X,Y,eta(i))
+    hold on
+end
 
-
-    
-    
-    
-
-
-
-
-    
-    
-    
 
 
     

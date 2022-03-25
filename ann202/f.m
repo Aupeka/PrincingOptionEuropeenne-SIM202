@@ -1,6 +1,5 @@
-function val = f(x,y)
+function val = f(x,y,cas)
 % Fonction second membre dans l'équation de Poisson
-cas =1 ;
 if cas == 1
     val = 2*pi^2*sin(pi*x)*sin(pi*y) ; 
 end ;

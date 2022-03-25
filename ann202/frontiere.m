@@ -1,5 +1,5 @@
 function A = frontiere(x,y)
-% Evalue la valeur de g en un point donnÃ© de la frontiÃ¨re
+% Evalue la valeur de g en un point donné de la frontière
 if x==0 && y<=0
     A=0;
 else
